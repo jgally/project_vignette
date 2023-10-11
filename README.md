@@ -11,17 +11,6 @@ library(jsonlite)
 library(dplyr)
 ```
 
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
-
 ``` r
 #This is my first call of the API. My only resource on there is person and the filter is culture=American
 my_data <- httr::GET("https://api.harvardartmuseums.org/person?q=culture:American&apikey=1d505e26-5d36-4674-a35b-c40cab886778")  
@@ -33,13 +22,13 @@ str(my_data, max.level=1)
     ## List of 10
     ##  $ url        : chr "https://api.harvardartmuseums.org/person?q=culture:American&apikey=1d505e26-5d36-4674-a35b-c40cab886778"
     ##  $ status_code: int 200
-    ##  $ headers    :List of 11
+    ##  $ headers    :List of 14
     ##   ..- attr(*, "class")= chr [1:2] "insensitive" "list"
     ##  $ all_headers:List of 1
     ##  $ cookies    :'data.frame': 0 obs. of  7 variables:
-    ##  $ content    : raw [1:5541] 7b 22 69 6e ...
-    ##  $ date       : POSIXct[1:1], format: "2023-10-11 05:47:11"
-    ##  $ times      : Named num [1:6] 0 0.461 0.487 0.522 0.566 ...
+    ##  $ content    : raw [1:5542] 7b 22 69 6e ...
+    ##  $ date       : POSIXct[1:1], format: "2023-10-11 17:31:10"
+    ##  $ times      : Named num [1:6] 0 1.19 1.23 1.27 1.33 ...
     ##   ..- attr(*, "names")= chr [1:6] "redirect" "namelookup" "connect" "pretransfer" ...
     ##  $ request    :List of 7
     ##   ..- attr(*, "class")= chr "request"
@@ -71,7 +60,7 @@ readable_table
     ## [1] "https://api.harvardartmuseums.org/person?q=culture%3AAmerican&apikey=1d505e26-5d36-4674-a35b-c40cab886778&page=2"
     ## 
     ## $info$responsetime
-    ## [1] "7 ms"
+    ## [1] "10 ms"
     ## 
     ## 
     ## $records
@@ -86,72 +75,72 @@ readable_table
     ## 8  unknown        <NA>           0
     ## 9     male   born 1949           1
     ## 10 unknown   1794-1878           1
-    ##                                                                roles
-    ## 1                  Donor/Lender/Vendor, Artist, object, object, 1, 1
-    ## 2                  Donor/Lender/Vendor, Artist, object, object, 1, 5
-    ## 3                    Author, Artist after, publication, object, 1, 1
-    ## 4                Artist, Donor/Lender/Vendor, object, object, 27, 21
-    ## 5               Donor/Lender/Vendor, Artist, object, object, 2840, 3
-    ## 6                  Donor/Lender/Vendor, Artist, object, object, 3, 3
-    ## 7                  Artist, Donor/Lender/Vendor, object, object, 1, 1
-    ## 8                                             Author, publication, 2
-    ## 9  Artist, Author, Curator, object, publication, exhibition, 1, 4, 1
-    ## 10                                                 Sitter, object, 2
-    ##    dateend                                                       url
-    ## 1        0  https://www.harvardartmuseums.org/collections/person/110
-    ## 2        0  https://www.harvardartmuseums.org/collections/person/151
-    ## 3     1920  https://www.harvardartmuseums.org/collections/person/628
-    ## 4     2009  https://www.harvardartmuseums.org/collections/person/673
-    ## 5     2011  https://www.harvardartmuseums.org/collections/person/818
-    ## 6     2010  https://www.harvardartmuseums.org/collections/person/825
-    ## 7        0 https://www.harvardartmuseums.org/collections/person/1125
-    ## 8        0 https://www.harvardartmuseums.org/collections/person/1356
-    ## 9     9999 https://www.harvardartmuseums.org/collections/person/1358
-    ## 10    1878 https://www.harvardartmuseums.org/collections/person/1613
-    ##      birthplace datebegin  culture             displayname
-    ## 1          <NA>         0 American         Cathryn Griffin
-    ## 2          <NA>      1950 American             Mark Cooper
-    ## 3          <NA>      1847 American  Alfred William Parsons
-    ## 4  New York, NY      1935 American           Michael Mazur
-    ## 5          <NA>      1942 American Susan Wilmarth-Rabineau
-    ## 6          <NA>      1958 American          Kate Freedberg
-    ## 7          <NA>         0 American           Patti Capaldi
-    ## 8          <NA>         0 American           Robert Taylor
-    ## 9  Portland, ME      1949 American            Robert Storr
-    ## 10         <NA>      1794 American   William Cullen Bryant
-    ##                   alphasort personid         deathplace   id
-    ## 1          Griffin, Cathryn      110               <NA>  110
-    ## 2              Cooper, Mark      151               <NA>  151
-    ## 3   Parsons, Alfred William      628               <NA>  628
-    ## 4            Mazur, Michael      673   Cambridge, Mass.  673
-    ## 5  Wilmarth-Rabineau, Susan      818 New York, New York  818
-    ## 6           Freedberg, Kate      825               <NA>  825
-    ## 7            Capaldi, Patti     1125               <NA> 1125
-    ## 8            Taylor, Robert     1356               <NA> 1356
-    ## 9             Storr, Robert     1358               <NA> 1358
-    ## 10   Bryant, William Cullen     1613               <NA> 1613
-    ##                  lastupdate                                 names
-    ## 1  2023-10-10T09:16:13-0400                                  NULL
-    ## 2  2023-10-10T09:16:52-0400             Mark Cooper, Primary Name
-    ## 3  2023-10-10T09:16:15-0400  Alfred William Parsons, Primary Name
-    ## 4  2023-10-10T09:16:58-0400           Michael Mazur, Primary Name
-    ## 5  2023-10-10T09:15:52-0400 Susan Wilmarth-Rabineau, Primary Name
-    ## 6  2023-10-10T09:14:41-0400          Kate Freedberg, Primary Name
-    ## 7  2023-10-10T09:14:35-0400                                  NULL
-    ## 8  2023-10-10T09:16:48-0400                                  NULL
-    ## 9  2023-10-10T09:15:13-0400            Robert Storr, Primary Name
-    ## 10 2023-10-10T09:16:46-0400   William Cullen Bryant, Primary Name
-    ##    wikipedia_id wikidata_id   viaf_id   ulan_id
-    ## 1          <NA>        <NA>      <NA>      <NA>
-    ## 2      46909763        <NA>      <NA>      <NA>
-    ## 3          <NA>        <NA>      <NA>      <NA>
-    ## 4      38497254    Q6832612  72274142 500094336
-    ## 5          <NA>        <NA>      <NA>      <NA>
-    ## 6          <NA>        <NA>      <NA>      <NA>
-    ## 7          <NA>        <NA>      <NA>      <NA>
-    ## 8          <NA>        <NA>      <NA>      <NA>
-    ## 9       7309115        <NA> 110730421 500461115
-    ## 10         <NA>        <NA>      <NA>      <NA>
+    ##                                                                roles dateend
+    ## 1                  Donor/Lender/Vendor, Artist, object, object, 1, 1       0
+    ## 2                  Donor/Lender/Vendor, Artist, object, object, 1, 5       0
+    ## 3                    Artist after, Author, object, publication, 1, 1    1920
+    ## 4                Donor/Lender/Vendor, Artist, object, object, 21, 27    2009
+    ## 5               Donor/Lender/Vendor, Artist, object, object, 2840, 3    2011
+    ## 6                  Artist, Donor/Lender/Vendor, object, object, 3, 3    2010
+    ## 7                  Donor/Lender/Vendor, Artist, object, object, 1, 1       0
+    ## 8                                             Author, publication, 2       0
+    ## 9  Artist, Curator, Author, object, exhibition, publication, 1, 1, 4    9999
+    ## 10                                                 Sitter, object, 2    1878
+    ##                                                          url   birthplace datebegin
+    ## 1   https://www.harvardartmuseums.org/collections/person/110         <NA>         0
+    ## 2   https://www.harvardartmuseums.org/collections/person/151         <NA>      1950
+    ## 3   https://www.harvardartmuseums.org/collections/person/628         <NA>      1847
+    ## 4   https://www.harvardartmuseums.org/collections/person/673 New York, NY      1935
+    ## 5   https://www.harvardartmuseums.org/collections/person/818         <NA>      1942
+    ## 6   https://www.harvardartmuseums.org/collections/person/825         <NA>      1958
+    ## 7  https://www.harvardartmuseums.org/collections/person/1125         <NA>         0
+    ## 8  https://www.harvardartmuseums.org/collections/person/1356         <NA>         0
+    ## 9  https://www.harvardartmuseums.org/collections/person/1358 Portland, ME      1949
+    ## 10 https://www.harvardartmuseums.org/collections/person/1613         <NA>      1794
+    ##     culture             displayname                alphasort personid
+    ## 1  American         Cathryn Griffin         Griffin, Cathryn      110
+    ## 2  American             Mark Cooper             Cooper, Mark      151
+    ## 3  American  Alfred William Parsons  Parsons, Alfred William      628
+    ## 4  American           Michael Mazur           Mazur, Michael      673
+    ## 5  American Susan Wilmarth-Rabineau Wilmarth-Rabineau, Susan      818
+    ## 6  American          Kate Freedberg          Freedberg, Kate      825
+    ## 7  American           Patti Capaldi           Capaldi, Patti     1125
+    ## 8  American           Robert Taylor           Taylor, Robert     1356
+    ## 9  American            Robert Storr            Storr, Robert     1358
+    ## 10 American   William Cullen Bryant   Bryant, William Cullen     1613
+    ##            deathplace   id               lastupdate
+    ## 1                <NA>  110 2023-10-11T10:33:15-0400
+    ## 2                <NA>  151 2023-10-11T10:34:08-0400
+    ## 3                <NA>  628 2023-10-11T10:33:48-0400
+    ## 4    Cambridge, Mass.  673 2023-10-11T10:31:31-0400
+    ## 5  New York, New York  818 2023-10-11T10:33:21-0400
+    ## 6                <NA>  825 2023-10-11T10:32:04-0400
+    ## 7                <NA> 1125 2023-10-11T10:31:58-0400
+    ## 8                <NA> 1356 2023-10-11T10:34:23-0400
+    ## 9                <NA> 1358 2023-10-11T10:32:41-0400
+    ## 10               <NA> 1613 2023-10-11T10:34:16-0400
+    ##                                    names wikipedia_id wikidata_id   viaf_id
+    ## 1                                   NULL         <NA>        <NA>      <NA>
+    ## 2              Mark Cooper, Primary Name     46909763        <NA>      <NA>
+    ## 3   Alfred William Parsons, Primary Name         <NA>        <NA>      <NA>
+    ## 4            Michael Mazur, Primary Name     38497254    Q6832612  72274142
+    ## 5  Susan Wilmarth-Rabineau, Primary Name         <NA>        <NA>      <NA>
+    ## 6           Kate Freedberg, Primary Name         <NA>        <NA>      <NA>
+    ## 7                                   NULL         <NA>        <NA>      <NA>
+    ## 8                                   NULL         <NA>        <NA>      <NA>
+    ## 9             Robert Storr, Primary Name      7309115        <NA> 110730421
+    ## 10   William Cullen Bryant, Primary Name         <NA>        <NA>      <NA>
+    ##      ulan_id
+    ## 1       <NA>
+    ## 2       <NA>
+    ## 3       <NA>
+    ## 4  500094336
+    ## 5       <NA>
+    ## 6       <NA>
+    ## 7       <NA>
+    ## 8       <NA>
+    ## 9  500461115
+    ## 10      <NA>
 
 ``` r
 #Picking which columns I want to work with
