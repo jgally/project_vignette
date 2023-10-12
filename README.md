@@ -1,7 +1,19 @@
 Project 2
 ================
 
-\##Beginner Friendly Havard Art Museum API Query
+## Beginner Friendly Havard Art Museum API Query
+
+So you like art. You like the art that is in the Harvard Art Museum. You
+want to know the numbers and data behind the art in the museum. The
+Harvard Art Museum API is the resource for you. This vignette is the
+resource to make your API data dive easier!
+
+There’s many parts to obtaining the data from an API. Typically a URL
+must be made to call the API, the returned data will need to be parsed
+into a readable format, and then sort and clean the data to uncover your
+perfect dataset. For coding beginners this may seem like a daunting
+task; however, this vignette will guide you through the steps- starting
+with what packages you need downloaded.
 
 ### Necessary Libraries
 
@@ -14,29 +26,27 @@ Those packages are:
 - `tidyverse` to  
 - `ggplot2` to make graphics
 
-So you like art. You like the art that is in the Harvard Art Museum. You
-want to know the numbers and data behind the art in the museum. The
-Harvard Art Museum API is the resource for you. This vignette is the
-resource to make your API data dive easier!
+## How to Query the Harvard Art API
 
-How to Query the Harvard Art API
+After reading in those libraries the next step is to code your query! In
+my experience, making sure the syntax on the API call is correct can be
+a lot when starting out. Good thing that the Harvard Art Museum API is
+very beginner friendly! There is plenty of good documentation to explain
+the database so figuring out what resources or filters to use isn’t so
+difficult. To make the process more simple I have created multiple
+functions to go through the call, parsing, and filtering of data from an
+API. So after you sign up for an API key on the Harvard Art Museum API
+website, feel free to try out these helpful functions.
 
-There’s many parts to obtaining the data from an API so I wrote a couple
-functions to ease your stress.
+### Homemade Functions
 
 `composing_URL`
 
-I made this function to simplify the process of writing the correct API
-URL. In my experience, making sure the syntax on the API call is correct
-can be daunting when starting out. Good thing that the Harvard Art
-Museum API is very beginner friendly! There is plenty of good
-documentation to explain the database so figuring out what “resource” or
-“filtering” that you would like to observe isn’t so difficult.
-
 In this function the inputs are “resource”, “filtering”, and “key”. All
 three of these inputs must to be entered as a character string with
-quotes around the option. You must sign up on the Harvard Art Museum API
-for your personal API key.
+quotes around the option. `composing_URL` will return one of two base
+URL formats to access the API. These base URLs can be made unique with
+the multitude of options for the arguments.
 
 ``` r
 #This function will return the URL to use to access the correct API endpoint
@@ -50,51 +60,36 @@ composing_URL <- function(resource, key, filtering = "na"){
 }
 ```
 
-`get_parsed`
+`more_pages`
 
-This function helps to call and parse the data into a readable R object.
+In case you need more data for your uses, I created a pagination
+function to help ease the process of gathering more information from the
+Harvard Art Museum API. This API does have a limit of 10,000 entries per
+API key so be wise in how you are grabbing data. The input includes your
+base URL, where you want to set your limit at (the default is 1,000 so
+you don’t query all in one spot, remember 10,000 is the limit set by the
+API and you cannot change that), and how many items you would like to
+see on each page.
 
-\#\`\`\`{r get_parsed, include = FALSE}  
-\#This function is to call the API and then to make it into a readable R
-object  
-get_parsed \<- function(my_URL){ \#THis part calls the API my_data \<-
-httr::GET(my_URL)
-
-\#I included this piece so that you can see how the API call shows up  
-str(my_data, max.level=1)
-
-\#The important information you would want in in the results or content
-section so this function pulls from there and makes it readable  
-readable_table \<- fromJSON(rawToChar(my_data\$content)) }
-
-\#This part creates a tibble which prints the information a little nicer
-than a regular table. better_table \<- as_tibble(readable_table)
-return(better_table)
-
-
-    `more_pages`  
-
-    In case you need more data for your uses, I created a pagination function to help ease the process of gathering more information from the Harvard Art Museum API. This API does have a limit of 10,000 entries per API key so be wise in how you are grabbing data. The input includes your base URL, where you want to set your limit at (the default is 1,000 so you don't query all in one spot, remember 10,000 is the limit set by the API and you cannot change that), and how many items you would like to see on each page.
-
-
-    ```r
-    #A while loop is a good fit to watch your limits. It only works while a condition is true.
-    more_pages <- function(my_URL, limit = 1000, items_per_page){
-      #Setting up all other variables for this function  
-      #Setting this at zero for when you begin to query  
-      items_received <- 0  
-      
-      #This variable is telling R what page we are on  
-      on_page <- 1  
-      
-      
-    }
+``` r
+#A while loop is a good fit to watch your limits. It only works while a condition is true.
+more_pages <- function(my_URL, limit = 1000, items_per_page){
+  #Setting up all other variables for this function  
+  #Setting this at zero for when you begin to query  
+  items_received <- 0  
+  
+  #This variable is telling R what page we are on  
+  on_page <- 1  
+  
+  
+}
+```
 
 `object_info`
 
 If you’re a little lost in where to start your search I have also made
 some other functions to query more specific endpoints of the Harvard Art
-Museum API. `object_info` is One of the resources in this API is
+Museum API. `object_info` is one of the resources in this API is
 “object” which gives more information about the artwork, artist, online
 view count, and even what medium was used. The purpose of this function
 is to access the object ID, what century it is from, what culture it is
@@ -150,20 +145,6 @@ informational_table <- as_tibble(selected_table)
 print(informational_table)
 ```
 
-    ## # A tibble: 10 x 3
-    ##    gender  objectcount datebegin
-    ##    <chr>         <int>     <int>
-    ##  1 unknown           0         0
-    ##  2 male              4      1950
-    ##  3 unknown           1      1847
-    ##  4 male             27      1935
-    ##  5 female            3      1942
-    ##  6 female            3      1958
-    ##  7 unknown           0         0
-    ##  8 unknown           0         0
-    ##  9 male              1      1949
-    ## 10 unknown           1      1794
-
 `century_objects`
 
 Maybe you’re more of a history buff, and you would like to only learn
@@ -191,28 +172,14 @@ informational_table <- as_tibble(selected_table)
 print(informational_table)
 ```
 
-    ## # A tibble: 10 x 3
-    ##    gender  objectcount datebegin
-    ##    <chr>         <int>     <int>
-    ##  1 unknown           0         0
-    ##  2 male              4      1950
-    ##  3 unknown           1      1847
-    ##  4 male             27      1935
-    ##  5 female            3      1942
-    ##  6 female            3      1958
-    ##  7 unknown           0         0
-    ##  8 unknown           0         0
-    ##  9 male              1      1949
-    ## 10 unknown           1      1794
-
 `find_people`
 
 Are you more of a people person? If you would like to know more about
 the people behind the work `find_people` can introduce you to some
 information. In this function the person ID (like object ID this can be
 used to call information about a specific person later), binary gender,
-culture, and object count (how many pieces from them) are returned in a
-neat little table as a result.
+culture, object count (how many pieces from them), and the date they
+began to show the work are returned in a neat little table as a result.
 
 ``` r
 #Calling the API for people who have had something displayed at the Harvard Art Museum  
@@ -222,8 +189,8 @@ my_data <- httr::GET("https://api.harvardartmuseums.org/person?&apikey=",key,"&s
 #Turning this into a table that is readable in R
 readable_table <- fromJSON(rawToChar(my_data$content))  
 
-#Picking out the personid, displayname, gender, culture, and objectcount  
-selected_table <- select(readable_table$records, personid, displayname, gender, culture, objectcount)
+#Picking out the personid, displayname, gender, culture, objectcount, and datebegin  
+selected_table <- select(readable_table$records, personid, displayname, gender, culture, objectcount, datebegin)
 }
 
 #Printing out the table a little nicer as a tibble  
@@ -233,19 +200,13 @@ informational_table <- as_tibble(selected_table)
 print(informational_table)
 ```
 
-    ## # A tibble: 10 x 3
-    ##    gender  objectcount datebegin
-    ##    <chr>         <int>     <int>
-    ##  1 unknown           0         0
-    ##  2 male              4      1950
-    ##  3 unknown           1      1847
-    ##  4 male             27      1935
-    ##  5 female            3      1942
-    ##  6 female            3      1958
-    ##  7 unknown           0         0
-    ##  8 unknown           0         0
-    ##  9 male              1      1949
-    ## 10 unknown           1      1794
+`cultured_people`
+
+Similar as before in `cultured_objects`, this function allows for the
+addition of filtering through the cultures of each person in the API
+records. This function has a similar input and output will look the same
+as the `find_people` function except all records will be from one
+specific culture.
 
 ``` r
 #Calling the API for people based on what culture they are from
@@ -255,8 +216,8 @@ my_data <- httr::GET("https://api.harvardartmuseums.org/person?q=culture:",cultu
 #Turning this into a table that is readable in R
 readable_table <- fromJSON(rawToChar(my_data$content))  
 
-#Picking out the personid, displayname, gender, culture (to assure correctness), and objectcount  
-selected_table <- select(readable_table$records, personid, displayname, gender, culture, objectcount)
+#Picking out the personid, displayname, gender, culture (to assure correctness), objectcount, and datebegin  
+selected_table <- select(readable_table$records, personid, displayname, gender, culture, objectcount, datebegin)
 }
 
 #Printing out the table a little nicer as a tibble  
@@ -266,19 +227,13 @@ informational_table <- as_tibble(selected_table)
 print(informational_table)
 ```
 
-    ## # A tibble: 10 x 3
-    ##    gender  objectcount datebegin
-    ##    <chr>         <int>     <int>
-    ##  1 unknown           0         0
-    ##  2 male              4      1950
-    ##  3 unknown           1      1847
-    ##  4 male             27      1935
-    ##  5 female            3      1942
-    ##  6 female            3      1958
-    ##  7 unknown           0         0
-    ##  8 unknown           0         0
-    ##  9 male              1      1949
-    ## 10 unknown           1      1794
+`person_gender`
+
+My personal favorite would be this `person_gender` function. I could see
+a lot of good data analysis coming from comparing the male to female
+records in this binary gender option. The input here will be your API
+key and then selecting male or female to retrun all the male data or all
+the female data.
 
 ``` r
 #Calling the API for people based on a binary gender model
@@ -288,8 +243,8 @@ my_data <- httr::GET("https://api.harvardartmuseums.org/person?q=gender:",gender
 #Turning this into a table that is readable in R
 readable_table <- fromJSON(rawToChar(my_data$content))  
 
-#Picking out the personid, displayname, gender (to assure correctness), culture, and objectcount  
-selected_table <- select(readable_table$records, personid, displayname, gender, culture, objectcount)
+#Picking out the personid, displayname, gender (to assure correctness), culture, objectcount, and datebegin  
+selected_table <- select(readable_table$records, personid, displayname, gender, culture, objectcount, datebegin)
 }
 
 #Printing out the table a little nicer as a tibble  
@@ -298,17 +253,3 @@ informational_table <- as_tibble(selected_table)
 #Returning the informational table 
 print(informational_table)
 ```
-
-    ## # A tibble: 10 x 3
-    ##    gender  objectcount datebegin
-    ##    <chr>         <int>     <int>
-    ##  1 unknown           0         0
-    ##  2 male              4      1950
-    ##  3 unknown           1      1847
-    ##  4 male             27      1935
-    ##  5 female            3      1942
-    ##  6 female            3      1958
-    ##  7 unknown           0         0
-    ##  8 unknown           0         0
-    ##  9 male              1      1949
-    ## 10 unknown           1      1794
