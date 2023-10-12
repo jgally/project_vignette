@@ -22,8 +22,8 @@ Those packages are:
 
 - `httr` to call the API
 - `jsonlite` to make the JSON API output more readable in R  
-- `dplyr` to  
-- `tidyverse` to  
+- `dplyr` to manipulate data
+- `tidyverse` to transform and present data
 - `ggplot2` to make graphics
 
 ## How to Query the Harvard Art API
