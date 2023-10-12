@@ -56,7 +56,7 @@ composing_URL <- function(resource, key, filtering = "na"){
     else{
     paste0("https://api.harvardartmuseums.org/",resource,"&apikey=",key)
     }
-  my_URL
+  return(my_URL)
 }
 ```
 
@@ -81,6 +81,12 @@ more_pages <- function(my_URL, limit = 1000, items_per_page){
   #This variable is telling R what page we are on  
   on_page <- 1  
   
+  #Here is the conditional while loop  
+  while (items_received < limit){
+    #Creating another with page number in the URL  
+    page_URL <- paste0(my_URL, "?page=", on_page)
+  }
+  
   
 }
 ```
@@ -101,7 +107,9 @@ the end result should be a table of object information.
 ``` r
 #Calling the API for object, information  
 object_info <- function(key){
-  my_data <- httr::GET("https://api.harvardartmuseums.org/object?&apikey=",key,"&size=30")  
+  #Pasting together the URL  
+  my_URL <- paste0("https://api.harvardartmuseums.org/object&apikey=",key)
+  my_data <- httr::GET(my_URL)  
 
   #Turning this into a table that is readable in R
   readable_table <- fromJSON(rawToChar(my_data$content))  
@@ -184,20 +192,28 @@ began to show the work are returned in a neat little table as a result.
 ``` r
 #Calling the API for people who have had something displayed at the Harvard Art Museum  
 find_people <- function(key){
-my_data <- httr::GET("https://api.harvardartmuseums.org/person?&apikey=",key,"&size=30")  
+my_data <- httr::GET("https://api.harvardartmuseums.org/person?&apikey=1d505e26-5d36-4674-a35b-c40cab886778&size=30")  
 
 #Turning this into a table that is readable in R
 readable_table <- fromJSON(rawToChar(my_data$content))  
 
 #Picking out the personid, displayname, gender, culture, objectcount, and datebegin  
 selected_table <- select(readable_table$records, personid, displayname, gender, culture, objectcount, datebegin)
-}
+
 
 #Printing out the table a little nicer as a tibble  
 informational_table <- as_tibble(selected_table)
 
-#Returning the informational table 
-print(informational_table)
+#Remove rows with NA  
+informational_table <- na.omit(informational_table)  
+
+clean_tbl <- subset(informational_table, gender != "unknown")
+#Remove the rows with unknowns in them
+clean_tbl <- informational_table[!apply(informational_table == "unknown", 1, any),] 
+
+#Returning the cleaned table 
+print(clean_tbl)
+}
 ```
 
 `cultured_people`
@@ -223,8 +239,14 @@ selected_table <- select(readable_table$records, personid, displayname, gender, 
 #Printing out the table a little nicer as a tibble  
 informational_table <- as_tibble(selected_table)
 
-#Returning the informational table 
-print(informational_table)
+#Remove rows with NA  
+informational_table <- na.omit(informational_table)  
+
+#Remove the rows with unknowns in them
+clean_tbl <- informational_table[-row(informational_table)[informational_table == "unknown"],]  
+
+#Returning the cleaned table 
+print(clean_tbl)
 ```
 
 `person_gender`
@@ -250,6 +272,70 @@ selected_table <- select(readable_table$records, personid, displayname, gender, 
 #Printing out the table a little nicer as a tibble  
 informational_table <- as_tibble(selected_table)
 
-#Returning the informational table 
-print(informational_table)
+#Remove rows with NA  
+informational_table <- na.omit(informational_table)  
+
+#Remove the rows with unknowns in them
+clean_tbl <- informational_table[-row(informational_table)[informational_table == "unknown"],]  
+
+#Returning the cleaned table 
+print(clean_tbl)
+```
+
+## Go Wild for Expoloratory Data Analysis (EDA)
+
+EDA is the most fun part of the API query journey! Now you can take
+whatever data you chose and figure out the different relationships
+between your specified options. Here I am going to analyze the
+difference between male and female records. I want to see which of these
+two genders appears more throughout time and how much each has. Commonly
+today we hear how men take up most of different spaces and I want to see
+if that applies to art at the museum as well. Do men hold the most space
+at museums? Is there any time when there were more obejcts from women
+than men? What is the average amount of object per man or woman?
+
+This first graph is a count plot of men and women over time. Bigger
+circles show that there are more of one gender throughout the dates.
+This plot is not perfect to show us the artists in their time, but can
+show us if there were more men or women at times based on their start
+date.
+
+``` r
+#I would use the find_people call to get the right data frame for this one
+#If provided the proper input, this would graph the count plot of the men and women during different datebegin
+  ggplot((aes(x = "gender", y = "datebegin"))) + 
+  geom_count(na.rm = TRUE, show.legend = TRUE) +
+  labs(x="Gender", y="Date They Began", title="Popular Starts for Men vs. Women")
+```
+
+This graph is a bar plot of the number of objects that men and women
+had. This is a very simple plot with two bars on it, but this is a
+visual to see the overall amounts of each.
+
+``` r
+#I would use find_people function and group_by(gender) to compare the objectcount from men to women
+#Plotting a bar graph
+ggplot(df, aes(x = gender, y = objectcount)) +
+  geom_bar() +
+  labs(x="Gender", y="Ojbect Count", title ="Who Has More")
+```
+
+Here I look at the center and spread of both the women and men’s object
+counts. This would directly answer my question of who takes up more
+space overall in the data base, but I would also point out that there
+were many records with “unknown” listed as their gender so these results
+don’t tell the whole story.
+
+``` r
+#I would grab the womens table from the person_gender function to gather those stats  
+womens_stats <- summary(clean_womens$objectcount)  
+
+#Printing out the stats
+print(womens_stats)  
+
+#Then I would grab the mens table from the person_gender function to get those stats  
+mens_stats <- summary(clean_mens)
+
+#Printing out mens stats  
+print(mens_stats)  
 ```
