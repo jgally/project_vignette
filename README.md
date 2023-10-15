@@ -101,30 +101,34 @@ Museum API. `object_info` is one of the resources in this API is
 “object” which gives more information about the artwork, artist, online
 view count, and even what medium was used. The purpose of this function
 is to access the object ID, what century it is from, what culture it is
-from, the total online page views, and the medium. The object ID is
-included in this tibble in case you would like to remember a specific
-object to call for later on. The only input is your personal API key and
-the end result should be a table of object information.
+from, and the total online page views. The object ID is included in this
+tibble in case you would like to remember a specific object to call for
+later on. The only input is your personal API key and the end result
+should be a table of object information.
 
 ``` r
 #Calling the API for object, information  
 object_info <- function(key){
-  #Pasting together the URL  
+  #Providing the base URL  
   base_URL <- "https://api.harvardartmuseums.org/object?apikey="  
-  key <- key
-  object_URL <- paste0(base_URL, key)
- 
+  
+  #Pasting together the API
+  object_URL <- paste0(base_URL, key)  
+  
+  #Pulling data from the API
   my_data <- httr::GET(object_URL)  
 
-  #Turning this into a table that is readable in R
+  #Turning data into a table that is readable in R
   readable_table <- fromJSON(rawToChar(my_data$content))  
 
-  #Picking out the objectid, century, culture, totalpageviews, and medium
-  selected_table <- select(readable_table$records, objectid, century, culture, totalpageviews, medium)
-
+  #Picking out the objectid, century, culture, and totalpageviews
+  selected_table <- select(readable_table$records, objectid, century, culture, totalpageviews)
 
   #Printing out the table a little nicer as a tibble  
-  informational_table <- as_tibble(selected_table)
+  informational_table <- as_tibble(selected_table)  
+  
+  #Remove rows with NA  
+  informational_table <- na.omit(informational_table)  
 
   #Returning the informational table }
   print(informational_table)
@@ -142,22 +146,30 @@ the culture name which should be specified in quotations.
 ``` r
 #Calling the API for objects from a specific culture  
 cultured_objects <- function(key, culture){
+  #Providing the base URL  
+  base_URL <- "https://api.harvardartmuseums.org/object?apikey="  
  
- 
-my_data <- httr::GET("https://api.harvardartmuseums.org/object?apikey=",key,"&q=culture:",culture)  
+  #Pasting together the API
+  cult_obj_URL <- paste0(base_URL,key,"&q=culture:",culture)  
+  
+  #Pulling data from the API
+  my_data <- httr::GET(cult_obj_URL)  
 
-#Turning this into a table that is readable in R
-readable_table <- fromJSON(rawToChar(my_data$content))  
+  #Turning data into a table that is readable in R
+  readable_table <- fromJSON(rawToChar(my_data$content))  
 
-#Picking out the objectid, century to assure you received the correct information, culture, totalpageviews, and medium
-selected_table <- select(readable_table$records, objectid, century, culture, totalpageviews, medium)
+  #Picking out the objectid, century, culture to assure you received the correct information, and totalpageviews
+  selected_table <- select(readable_table$records, objectid, century, culture, totalpageviews)
+
+  #Printing out the table a little nicer as a tibble  
+  informational_table <- as_tibble(selected_table)  
+  
+  #Remove rows with NA  
+  informational_table <- na.omit(informational_table)  
+
+  #Returning the informational table 
+  print(informational_table)  
 }
-
-#Printing out the table a little nicer as a tibble  
-informational_table <- as_tibble(selected_table)
-
-#Returning the informational table 
-print(informational_table)
 ```
 
 `century_objects`
@@ -171,20 +183,30 @@ century you would like to look at. Century should be in the format of:
 ``` r
 #Calling the API for objects from different centuries  
 century_objects <- function(key, century){
-my_data <- httr::GET("https://api.harvardartmuseums.org/object?q=century:",century,"&apikey=",key,"&size=30")  
+  #Providing the base URL  
+  base_URL <- "https://api.harvardartmuseums.org/object?apikey="  
+  
+  #Pasting together the API
+  cent_obj_URL <- paste0(base_URL,key,"&q=century:",century)  
+  
+  #Pulling data from the API
+  my_data <- httr::GET(cent_obj_URL)  
 
-#Turning this into a table that is readable in R
-readable_table <- fromJSON(rawToChar(my_data$content))  
+  #Turning this into a table that is readable in R
+  readable_table <- fromJSON(rawToChar(my_data$content))  
 
-#Picking out the objectid, century to assure correct information is received, culture, and totalpageviews 
-selected_table <- select(readable_table$records, objectid, century, culture, totalpageviews)
+  #Picking out the objectid, century to assure correct information is received, culture, and totalpageviews 
+  selected_table <- select(readable_table$records, objectid, century, culture, totalpageviews)
+
+  #Printing out the table a little nicer as a tibble  
+  informational_table <- as_tibble(selected_table)  
+  
+  #Remove rows with NA  
+  informational_table <- na.omit(informational_table)
+
+  #Returning the informational table 
+  print(informational_table)  
 }
-
-#Printing out the table a little nicer as a tibble  
-informational_table <- as_tibble(selected_table)
-
-#Returning the informational table 
-print(informational_table)
 ```
 
 `find_people`
@@ -199,27 +221,32 @@ began to show the work are returned in a neat little table as a result.
 ``` r
 #Calling the API for people who have had something displayed at the Harvard Art Museum  
 find_people <- function(key){
-my_data <- httr::GET("https://api.harvardartmuseums.org/person?&apikey=1d505e26-5d36-4674-a35b-c40cab886778&size=30")  
+    #Providing the base URL  
+  base_URL <- "https://api.harvardartmuseums.org/person?apikey="  
+  
+  #Pasting together the API
+  person_URL <- paste0(base_URL, key)  
+  
+  #Pulling data from the API
+  my_data <- httr::GET(person_URL)  
+  
+  #Turning this into a table that is readable in R
+  readable_table <- fromJSON(rawToChar(my_data$content))  
 
-#Turning this into a table that is readable in R
-readable_table <- fromJSON(rawToChar(my_data$content))  
+  #Picking out the personid, displayname, gender, objectcount, and datebegin  
+  selected_table <- select(readable_table$records, personid, displayname, gender, objectcount, datebegin)
 
-#Picking out the personid, displayname, gender, culture, objectcount, and datebegin  
-selected_table <- select(readable_table$records, personid, displayname, gender, culture, objectcount, datebegin)
+  #Printing out the table a little nicer as a tibble  
+  informational_table <- as_tibble(selected_table)
 
-
-#Printing out the table a little nicer as a tibble  
-informational_table <- as_tibble(selected_table)
-
-#Remove rows with NA  
-informational_table <- na.omit(informational_table)  
-
-clean_tbl <- subset(informational_table, gender != "unknown")
-#Remove the rows with unknowns in them
-clean_tbl <- informational_table[!apply(informational_table == "unknown", 1, any),] 
-
-#Returning the cleaned table 
-print(clean_tbl)
+  #Remove rows with NA  
+  informational_table <- na.omit(informational_table)  
+  
+  #Remove the rows with subset() to clean the data some 
+  pers_tbl <- subset(informational_table, (gender != "unknown" & objectcount != 0 & datebegin != 0))  
+  
+  #Returning the good table 
+  return(pers_tbl)  
 }
 ```
 
@@ -267,26 +294,30 @@ the female data.
 ``` r
 #Calling the API for people based on a binary gender model
 person_gender <- function(key, gender){
-my_data <- httr::GET("https://api.harvardartmuseums.org/person?q=gender:",gender,"&apikey=",key,"&size=30")  
+    #Providing the base URL  
+  base_URL <- "https://api.harvardartmuseums.org/person?apikey="  
+  
+  #Pasting together the API
+  gen_pers_URL <- paste0(base_URL,key,"&q=gender:",gender)  
+  
+  #Pulling data from the API
+  my_data <- httr::GET(gen_pers_URL)  
 
-#Turning this into a table that is readable in R
-readable_table <- fromJSON(rawToChar(my_data$content))  
+  #Turning this into a table that is readable in R
+  readable_table <- fromJSON(rawToChar(my_data$content))  
+ 
+  #Picking out the personid, displayname, gender (to assure correctness), objectcount, and datebegin  
+  selected_table <- select(readable_table$records, personid, displayname, gender, objectcount, datebegin)
 
-#Picking out the personid, displayname, gender (to assure correctness), culture, objectcount, and datebegin  
-selected_table <- select(readable_table$records, personid, displayname, gender, culture, objectcount, datebegin)
+  #Printing out the table a little nicer as a tibble  
+  informational_table <- as_tibble(selected_table)
+
+  #Remove the rows with subset() to clean the data some 
+  gen_pers_tbl <- subset(informational_table, (gender != "unknown" & objectcount != 0 & datebegin != 0))  
+  
+  #Returning the good table 
+  return(gen_pers_tbl)  
 }
-
-#Printing out the table a little nicer as a tibble  
-informational_table <- as_tibble(selected_table)
-
-#Remove rows with NA  
-informational_table <- na.omit(informational_table)  
-
-#Remove the rows with unknowns in them
-clean_tbl <- informational_table[-row(informational_table)[informational_table == "unknown"],]  
-
-#Returning the cleaned table 
-print(clean_tbl)
 ```
 
 ## Go Wild for Expoloratory Data Analysis (EDA)
@@ -300,6 +331,97 @@ today we hear how men take up most of different spaces and I want to see
 if that applies to art at the museum as well. Do men hold the most space
 at museums? Is there any time when there were more obejcts from women
 than men? What is the average amount of object per man or woman?
+
+``` r
+#Using my find_people function to pull in data for this numerical summary  
+pers_tbl <- find_people("1d505e26-5d36-4674-a35b-c40cab886778")  
+
+#Must use the pagination function here to pull enough data to have a good sample amount  
+
+
+#Selecting the specific columns I want to look at so summarise() does not clutter the table
+gen_summary <- pers_tbl %>% 
+              select(gender, objectcount) %>% 
+              group_by(gender) %>% 
+              summarise(mean = mean(objectcount),
+                       sd = sd(objectcount),
+                       min = min(objectcount),
+                       max = max(objectcount),
+                       IQR = IQR(objectcount))  
+
+#Printing the summaries table
+print(gen_summary)  
+```
+
+    ## # A tibble: 1 × 6
+    ##   gender  mean    sd   min   max   IQR
+    ##   <chr>  <dbl> <dbl> <int> <int> <dbl>
+    ## 1 male       2    NA     2     2     0
+
+``` r
+#Making a boxplot of the summary statistics for a more visual look  
+gen_plot1 <- ggplot(data = gen_summary, aes(x = "gender", y = "objectcount")) +
+         geom_boxplot()
+```
+
+``` r
+#Using the finc_people function to pull data for the contingency table  
+pers_tbl <- find_people("1d505e26-5d36-4674-a35b-c40cab886778")  
+
+#Must include the pagination function to get a large enough sample size  
+
+#Creating a contingency table for gender and datebegin  
+con_tbl_1 <- table(pers_tbl$gender, 
+                  pers_tbl$datebegin)  
+#Printing out the contingency table 
+print(con_tbl_1)
+```
+
+    ##       
+    ##        1812
+    ##   male    1
+
+``` r
+#Using the finc_people function to pull data for the contingency table  
+obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
+```
+
+    ## # A tibble: 10 × 4
+    ##    objectid century      culture  totalpageviews
+    ##       <int> <chr>        <chr>             <int>
+    ##  1    54767 20th century American              2
+    ##  2    54768 20th century American              2
+    ##  3    54769 20th century American              3
+    ##  4    54770 20th century American              1
+    ##  5    54771 20th century American              6
+    ##  6    54772 20th century American              1
+    ##  7    54773 20th century American              4
+    ##  8    54774 20th century American              1
+    ##  9    54775 20th century American              3
+    ## 10    54776 20th century American              7
+
+``` r
+#Must include the pagination function to get a large enough sample size  
+
+#Creating a contingency table for gender and datebegin  
+con_tbl_2 <- table(obj_tbl$culture, 
+                  obj_tbl$century)  
+#Printing out the contingency table 
+print(con_tbl_2)
+```
+
+    ##           
+    ##            20th century
+    ##   American           10
+
+``` r
+#Using person_gender() to pull only female records first
+pers_tbl <- find_people("1d505e26-5d36-4674-a35b-c40cab886778")  
+
+#Making a line plot off of the objectcount over time for each gender
+obj_cnt_plot2 <- ggplot(pers_tbl, aes(x = datebegin, y = objectcount, color = gender)) + 
+            geom_line()
+```
 
 This first graph is a count plot of men and women over time. Bigger
 circles show that there are more of one gender throughout the dates.
