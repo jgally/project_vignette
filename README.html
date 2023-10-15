@@ -602,6 +602,7 @@ padding-top: 0px;
 <body>
 
 <h1 id="project-2">Project 2</h1>
+<p>Jasmine Gallaway 10-14-2023</p>
 <h2 id="beginner-friendly-havard-art-museum-api-query">Beginner Friendly
 Havard Art Museum API Query</h2>
 <p>So you like art. You like the art that is in the Harvard Art Museum.
@@ -692,22 +693,25 @@ API key and the end result should be a table of object information.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co">#Calling the API for object, information  </span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>object_info <span class="ot">&lt;-</span> <span class="cf">function</span>(key){</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="co">#Pasting together the URL  </span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  my_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;https://api.harvardartmuseums.org/object&amp;apikey=&quot;</span>,key)</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  my_data <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(my_URL)  </span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  <span class="co">#Turning this into a table that is readable in R</span></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  readable_table <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">rawToChar</span>(my_data<span class="sc">$</span>content))  </span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  base_URL <span class="ot">&lt;-</span> <span class="st">&quot;https://api.harvardartmuseums.org/object?apikey=&quot;</span>  </span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  key <span class="ot">&lt;-</span> key</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  object_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(base_URL, key)</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a> </span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  my_data <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(object_URL)  </span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="co">#Picking out the objectid, century, culture, totalpageviews, and medium</span></span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  selected_table <span class="ot">&lt;-</span> <span class="fu">select</span>(readable_table<span class="sc">$</span>records, objectid, century, culture, totalpageviews, medium)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="co">#Turning this into a table that is readable in R</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  readable_table <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">rawToChar</span>(my_data<span class="sc">$</span>content))  </span>
 <span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a></span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  <span class="co">#Printing out the table a little nicer as a tibble  </span></span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  informational_table <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(selected_table)</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>  <span class="co">#Picking out the objectid, century, culture, totalpageviews, and medium</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  selected_table <span class="ot">&lt;-</span> <span class="fu">select</span>(readable_table<span class="sc">$</span>records, objectid, century, culture, totalpageviews, medium)</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a></span>
 <span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a></span>
-<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>  <span class="co">#Returning the informational table </span></span>
-<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>  <span class="fu">print</span>(informational_table)</span>
-<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>  <span class="co">#Printing out the table a little nicer as a tibble  </span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>  informational_table <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(selected_table)</span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>  <span class="co">#Returning the informational table }</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>  <span class="fu">print</span>(informational_table)</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>}</span></code></pre></div>
 <p><code>cultured_objects</code></p>
 <p>This function is to call to the API for more information about the
 objects, but only selecting a particular culture of objects to look at.
@@ -716,20 +720,22 @@ Byzantine, and Japanese. The only necessary input is your API key and
 the culture name which should be specified in quotations.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co">#Calling the API for objects from a specific culture  </span></span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>cultured_objects <span class="ot">&lt;-</span> <span class="cf">function</span>(key, culture){</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(<span class="st">&quot;https://api.harvardartmuseums.org/object?q=culture:&quot;</span>,culture,<span class="st">&quot;&amp;apikey=&quot;</span>,key,<span class="st">&quot;&amp;size=30&quot;</span>)  </span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#Turning this into a table that is readable in R</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>readable_table <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">rawToChar</span>(my_data<span class="sc">$</span>content))  </span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#Picking out the objectid, century to assure you received the correct information, culture, totalpageviews, and medium</span></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>selected_table <span class="ot">&lt;-</span> <span class="fu">select</span>(readable_table<span class="sc">$</span>records, objectid, century, culture, totalpageviews, medium)</span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>}</span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#Printing out the table a little nicer as a tibble  </span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>informational_table <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(selected_table)</span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a></span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#Returning the informational table </span></span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="fu">print</span>(informational_table)</span></code></pre></div>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a> </span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a> </span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(<span class="st">&quot;https://api.harvardartmuseums.org/object?apikey=&quot;</span>,key,<span class="st">&quot;&amp;q=culture:&quot;</span>,culture)  </span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#Turning this into a table that is readable in R</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>readable_table <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">rawToChar</span>(my_data<span class="sc">$</span>content))  </span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#Picking out the objectid, century to assure you received the correct information, culture, totalpageviews, and medium</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>selected_table <span class="ot">&lt;-</span> <span class="fu">select</span>(readable_table<span class="sc">$</span>records, objectid, century, culture, totalpageviews, medium)</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>}</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#Printing out the table a little nicer as a tibble  </span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>informational_table <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(selected_table)</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#Returning the informational table </span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="fu">print</span>(informational_table)</span></code></pre></div>
 <p><code>century_objects</code></p>
 <p>Maybe you’re more of a history buff, and you would like to only learn
 about objects from your favorite century. <code>century_objects</code>

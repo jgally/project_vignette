@@ -1,5 +1,7 @@
 Project 2
 ================
+Jasmine Gallaway
+10-14-2023
 
 ## Beginner Friendly Havard Art Museum API Query
 
@@ -108,8 +110,11 @@ the end result should be a table of object information.
 #Calling the API for object, information  
 object_info <- function(key){
   #Pasting together the URL  
-  my_URL <- paste0("https://api.harvardartmuseums.org/object&apikey=",key)
-  my_data <- httr::GET(my_URL)  
+  base_URL <- "https://api.harvardartmuseums.org/object?apikey="  
+  key <- key
+  object_URL <- paste0(base_URL, key)
+ 
+  my_data <- httr::GET(object_URL)  
 
   #Turning this into a table that is readable in R
   readable_table <- fromJSON(rawToChar(my_data$content))  
@@ -121,7 +126,7 @@ object_info <- function(key){
   #Printing out the table a little nicer as a tibble  
   informational_table <- as_tibble(selected_table)
 
-  #Returning the informational table 
+  #Returning the informational table }
   print(informational_table)
 }
 ```
@@ -137,7 +142,9 @@ the culture name which should be specified in quotations.
 ``` r
 #Calling the API for objects from a specific culture  
 cultured_objects <- function(key, culture){
-my_data <- httr::GET("https://api.harvardartmuseums.org/object?q=culture:",culture,"&apikey=",key,"&size=30")  
+ 
+ 
+my_data <- httr::GET("https://api.harvardartmuseums.org/object?apikey=",key,"&q=culture:",culture)  
 
 #Turning this into a table that is readable in R
 readable_table <- fromJSON(rawToChar(my_data$content))  
