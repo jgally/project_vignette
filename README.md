@@ -22,11 +22,12 @@ with what packages you need downloaded.
 This whole vignette was accomplished with a few installed packages.
 Those packages are:
 
-- `httr` to call the API
+- `httr` to call the API  
 - `jsonlite` to make the JSON API output more readable in R  
-- `dplyr` to manipulate data
-- `tidyverse` to transform and present data
-- `ggplot2` to make graphics
+- `dplyr` to manipulate data  
+- `tidyverse` to transform and present data  
+- `ggplot2` to make graphics  
+- `cowplot` to put plots on a grid for visual comparison
 
 ## How to Query the Harvard Art API
 
@@ -68,14 +69,15 @@ In case you need more data for your uses, I created a pagination
 function to help ease the process of gathering more information from the
 Harvard Art Museum API. This API does have a limit of 10,000 entries per
 API key so be wise in how you are grabbing data. The input includes your
-base URL, where you want to set your limit at (the default is 1,000 so
-you don’t query all in one spot, remember 10,000 is the limit set by the
-API and you cannot change that), and how many items you would like to
-see on each page.
+base URL, where you want to set your limit at (the default is 100 so you
+don’t query all in one spot, remember 10,000 is the limit set by the API
+and you cannot change that), and how many items you would like to see on
+each page.
 
 ``` r
+#This is what my best attempt at the pagination function would be. In my attempts to merge it with my other functions I decided to simply add a &size= to the URL calls so that I could get enough data. I changed the size of the functions that I use in my EDA to higher numbers so that I could get the graphs that I wanted 
 #A while loop is a good fit to watch your limits. It only works while a condition is true.
-more_pages <- function(my_URL, limit = 1000, items_per_page){
+more_pages <- function(my_URL, limit = 100, items_per_page = 10){
   #Setting up all other variables for this function  
   #Setting this at zero for when you begin to query  
   items_received <- 0  
@@ -85,11 +87,25 @@ more_pages <- function(my_URL, limit = 1000, items_per_page){
   
   #Here is the conditional while loop  
   while (items_received < limit){
-    #Creating another with page number in the URL  
-    page_URL <- paste0(my_URL, "?page=", on_page)
+  #Creating another with page number in the URL  
+  page_URL <- paste0(my_URL, "?page=", on_page)
+   
+  
+  #Getting data from the URL  
+  response <- httr::GET(page_URL)  
+  
+  #Saving the items on the page  
+  items <- httr::content(response)[["items"]]  
+  
+  #Adding the number of new items to the total items received so far
+  items_received <- items_received + length(items)  
+  
+  #Tracking what page of data it is on  
+  on_page <- on_page + 1  
   }
   
-  
+  #Letting the user know how many items they have called for from the API  
+  return(items_received)
 }
 ```
 
@@ -111,9 +127,9 @@ should be a table of object information.
 object_info <- function(key){
   #Providing the base URL  
   base_URL <- "https://api.harvardartmuseums.org/object?apikey="  
-  
+
   #Pasting together the API
-  object_URL <- paste0(base_URL, key)  
+  object_URL <- paste0(base_URL, key,"&size=200")  
   
   #Pulling data from the API
   my_data <- httr::GET(object_URL)  
@@ -150,7 +166,7 @@ cultured_objects <- function(key, culture){
   base_URL <- "https://api.harvardartmuseums.org/object?apikey="  
  
   #Pasting together the API
-  cult_obj_URL <- paste0(base_URL,key,"&q=culture:",culture)  
+  cult_obj_URL <- paste0(base_URL,key,"&q=culture:",culture,"&size=50")  
   
   #Pulling data from the API
   my_data <- httr::GET(cult_obj_URL)  
@@ -187,7 +203,7 @@ century_objects <- function(key, century){
   base_URL <- "https://api.harvardartmuseums.org/object?apikey="  
   
   #Pasting together the API
-  cent_obj_URL <- paste0(base_URL,key,"&q=century:",century)  
+  cent_obj_URL <- paste0(base_URL,key,"&q=century:",century,"&size=50")  
   
   #Pulling data from the API
   my_data <- httr::GET(cent_obj_URL)  
@@ -225,7 +241,7 @@ find_people <- function(key){
   base_URL <- "https://api.harvardartmuseums.org/person?apikey="  
   
   #Pasting together the API
-  person_URL <- paste0(base_URL, key)  
+  person_URL <- paste0(base_URL, key,"&size=200")  
   
   #Pulling data from the API
   my_data <- httr::GET(person_URL)  
@@ -250,37 +266,43 @@ find_people <- function(key){
 }
 ```
 
-`cultured_people`
+`date_people`
 
-Similar as before in `cultured_objects`, this function allows for the
-addition of filtering through the cultures of each person in the API
-records. This function has a similar input and output will look the same
-as the `find_people` function except all records will be from one
-specific culture.
+This function allows the user to change the years that the `datebegin`
+looks at. In this function the user can specify `before` or `after` a
+`year_desired` so that the records of people will reflect this
+modification.
 
 ``` r
-#Calling the API for people based on what culture they are from
-find_people <- function(key, culture){
-my_data <- httr::GET("https://api.harvardartmuseums.org/person?q=culture:",culture,"&apikey=",key,"&size=30")  
+#Calling the API for people who have had something displayed at the Harvard Art Museum  
+date_people <- function(key, when, year_desired){
+  #Providing the base URL  
+  base_URL <- "https://api.harvardartmuseums.org/person?apikey="  
+  
+  #Pasting together the API
+  date_pers_URL <- paste0(base_URL, key,"&",when,"=",year_desired,"&size=50")  
+  
+  #Pulling data from the API
+  my_data <- httr::GET(date_pers_URL)  
+  
+  #Turning this into a table that is readable in R
+  readable_table <- fromJSON(rawToChar(my_data$content))  
 
-#Turning this into a table that is readable in R
-readable_table <- fromJSON(rawToChar(my_data$content))  
+  #Picking out the personid, displayname, gender, objectcount, and datebegin  
+  selected_table <- select(readable_table$records, personid, displayname, gender, objectcount, datebegin)
 
-#Picking out the personid, displayname, gender, culture (to assure correctness), objectcount, and datebegin  
-selected_table <- select(readable_table$records, personid, displayname, gender, culture, objectcount, datebegin)
+  #Printing out the table a little nicer as a tibble  
+  informational_table <- as_tibble(selected_table)
+
+  #Remove rows with NA  
+  informational_table <- na.omit(informational_table)  
+  
+  #Remove the rows with subset() to clean the data some 
+  date_pers_tbl <- subset(informational_table, (gender != "unknown" & objectcount != 0 & datebegin != 0))  
+  
+  #Returning the good table 
+  return(date_pers_tbl)  
 }
-
-#Printing out the table a little nicer as a tibble  
-informational_table <- as_tibble(selected_table)
-
-#Remove rows with NA  
-informational_table <- na.omit(informational_table)  
-
-#Remove the rows with unknowns in them
-clean_tbl <- informational_table[-row(informational_table)[informational_table == "unknown"],]  
-
-#Returning the cleaned table 
-print(clean_tbl)
 ```
 
 `person_gender`
@@ -298,7 +320,7 @@ person_gender <- function(key, gender){
   base_URL <- "https://api.harvardartmuseums.org/person?apikey="  
   
   #Pasting together the API
-  gen_pers_URL <- paste0(base_URL,key,"&q=gender:",gender)  
+  gen_pers_URL <- paste0(base_URL,key,"&q=gender:",gender,"&size=200")  
   
   #Pulling data from the API
   my_data <- httr::GET(gen_pers_URL)  
@@ -333,15 +355,15 @@ at museums? Is there any time when there were more obejcts from women
 than men? What is the average amount of object per man or woman?
 
 ``` r
-#Using my find_people function to pull in data for this numerical summary  
-pers_tbl <- find_people("1d505e26-5d36-4674-a35b-c40cab886778")  
+#Had to make one specifically for the first 200 female and 200 males entries separately because there is so much data, but each user has a limit of 10,000 and I am not trying to hit that. 
+#Using my person_gender function to pull in data for this numerical summary  
+fem_pers_tbl <- person_gender("1d505e26-5d36-4674-a35b-c40cab886778", "female")  
 
-#Must use the pagination function here to pull enough data to have a good sample amount  
-
+#Doing the same for men  
+mal_pers_tbl <- person_gender("1d505e26-5d36-4674-a35b-c40cab886778", "male")
 
 #Selecting the specific columns I want to look at so summarise() does not clutter the table
-gen_summary <- pers_tbl %>% 
-              select(gender, objectcount) %>% 
+fem_gen_summary <- fem_pers_tbl %>% 
               group_by(gender) %>% 
               summarise(mean = mean(objectcount),
                        sd = sd(objectcount),
@@ -349,44 +371,225 @@ gen_summary <- pers_tbl %>%
                        max = max(objectcount),
                        IQR = IQR(objectcount))  
 
-#Printing the summaries table
-print(gen_summary)  
+#Doing the same for the male statistics
+mal_gen_summary <- mal_pers_tbl %>% 
+              group_by(gender) %>% 
+              summarise(mean = mean(objectcount),
+                       sd = sd(objectcount),
+                       min = min(objectcount),
+                       max = max(objectcount),
+                       IQR = IQR(objectcount))  
+
+#Printing the summaries table  
+print(fem_gen_summary)  
 ```
 
     ## # A tibble: 1 × 6
     ##   gender  mean    sd   min   max   IQR
     ##   <chr>  <dbl> <dbl> <int> <int> <dbl>
-    ## 1 male       2    NA     2     2     0
+    ## 1 female  4.78  12.8     1    81     2
+
+``` r
+#Printing the male summaries table  
+print(mal_gen_summary)  
+```
+
+    ## # A tibble: 1 × 6
+    ##   gender  mean    sd   min   max   IQR
+    ##   <chr>  <dbl> <dbl> <int> <int> <dbl>
+    ## 1 male    12.5  21.6     1   120    13
 
 ``` r
 #Making a boxplot of the summary statistics for a more visual look  
-gen_plot1 <- ggplot(data = gen_summary, aes(x = "gender", y = "objectcount")) +
-         geom_boxplot()
+mal_gen_plot1 <- ggplot(data = mal_pers_tbl, aes(x = gender, y = objectcount)) +
+         geom_boxplot() + 
+         labs(title = "How Many Objects per Man", x = "Male", y = "Object Count")
+
+#Making the womens objectcount summaries boxplot  
+fem_gen_plot1 <-ggplot(data = fem_pers_tbl, aes(x = gender, y = objectcount)) +
+         geom_boxplot() + 
+         labs(title = "How Many Objects per Woman", x = "Female", y = "Object Count")  
+
+#Plotting the two plots side by side for better visual  
+plot_grid(mal_gen_plot1, fem_gen_plot1, ncol = 2)
 ```
 
+![](README_files/figure-gfm/gender_summaries_plot1-1.png)<!-- -->
+
+These two boxplot show an interesting dynamic. Here we can see that the
+spread of how many object each male record has is larger than that of
+the female records. These numbers are further broken down in the
+numerical summaries of women (`fem_gen_summary`) and men
+(`mal_gen_summary`). In those numcerical summary tables women have on
+average a mean of about 4 objects and a maximum of 81 objects. In the
+men’s records, men have an average of about 12 objects and a maximum of
+120 objects. These results are based off of about 200 of the entries for
+men and women each. To draw conclusions off of this small sample size, I
+would say that men take up more space than women in the Harvard Art
+Museum. Now these results do not address timing yet, but the sheer
+difference in average objects per man lead me to believe that men in
+general hold more space in the museum.
+
+Next I want to address the time of when either gender is more popular. I
+made two contingency tables, one for each of the binary genders. In
+these tables I compared the frequency of the gender to each year
+recorded for `datebegin`. In the tables I expect to be abel to compare
+which year(s) were more popular for men or women based on the
+frequencies.
+
 ``` r
-#Using the finc_people function to pull data for the contingency table  
-pers_tbl <- find_people("1d505e26-5d36-4674-a35b-c40cab886778")  
+#Using the person_gender function to pull data for the contingency table for both men and women  
+fem_pers_tbl <- person_gender("1d505e26-5d36-4674-a35b-c40cab886778", "female")  
 
-#Must include the pagination function to get a large enough sample size  
+#Doing the same for men  
+mal_pers_tbl <- person_gender("1d505e26-5d36-4674-a35b-c40cab886778", "male")
 
-#Creating a contingency table for gender and datebegin  
-con_tbl_1 <- table(pers_tbl$gender, 
-                  pers_tbl$datebegin)  
-#Printing out the contingency table 
-print(con_tbl_1)
+#Creating a contingency table for women and datebegin  
+fem_con_tbl_1 <- table(fem_pers_tbl$gender, 
+                  fem_pers_tbl$datebegin)  
+
+#Creating a contingency table for men and datebegin  
+mal_con_tbl_2 <- table(mal_pers_tbl$gender, 
+                  mal_pers_tbl$datebegin)  
+
+#Printing out the contingency table for women   
+print(fem_con_tbl_1)  
+```
+
+    ##         
+    ##          1747 1820 1864 1876 1889 1891 1898 1900 1903 1907 1908 1912 1916 1922 1925 1926 1929 1930 1931 1933 1934 1935 1936 1937 1940 1941 1942 1943
+    ##   female    1    1    1    1    1    1    2    8    1    1    2    1    1    1    3    2    1    2    2    1    2    2    1    1    1    6    3    1
+    ##         
+    ##          1944 1945 1946 1950 1951 1952 1953 1954 1955 1957 1958 1960 1965 1990 1993
+    ##   female    3    3    1    1    3    3    1    1    1    1    1    1    1    1    1
+
+``` r
+#Printing out the contingency table for men   
+print(mal_con_tbl_2)  
 ```
 
     ##       
-    ##        1812
-    ##   male    1
+    ##        -100 1500 1743 1767 1800 1805 1809 1812 1819 1822 1830 1841 1843 1848 1858 1865 1872 1874 1880 1883 1887 1894 1906 1912 1914 1920 1926 1928
+    ##   male    1    2    1    1    1    1    1    2    1    2    1    1    1    2    1    1    1    2    1    3    2    1    1    1    1    1    1    1
+    ##       
+    ##        1931 1932 1934 1935 1938 1939 1940 1941 1942 1943 1944 1945 1946 1947 1948 1949 1950 1951 1952 1953 1955 1956 1964 1966 1968 1969 1970 1976
+    ##   male    2    2    2    2    2    1    1    1    1    2    2    1    1    3    2    2    1    1    1    1    2    1    1    2    1    1    1    1
+    ##       
+    ##        1978 1979
+    ##   male    1    1
+
+In the `mal_con_tbl_2` the most popular `datebegin` is in 1883 and 1947
+with both of these years having a total of 3 men beginning then. In the
+`fem_con_tbl_1` table women had the most starts in 1900, and 1941, with
+a total of 8 and 6, respectively. This is very interesting that women
+had more concentrated starts than men did. I would be very intrigued to
+figure out which records of women started during these time and what
+made this occur. These contingency tables are not the best as entries
+are removed due to NA values in other columns. Not all of the years are
+listed on both contingency tables so it is difficult to officially
+compare and draw conclusions. The only year with a high start date is in
+1941. In 1941 there were 6 women who started, compared to 1 man. Further
+data analysis is required to see which binary gender is more popular
+throughout each year.
+
+The next
 
 ``` r
-#Using the finc_people function to pull data for the contingency table  
+#Using the object_info function to pull data for the contingency table  
 obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
 ```
 
-    ## # A tibble: 10 × 4
+    ## # A tibble: 100 × 4
+    ##    objectid century      culture  totalpageviews
+    ##       <int> <chr>        <chr>             <int>
+    ##  1    54767 20th century American              2
+    ##  2    54768 20th century American              2
+    ##  3    54769 20th century American              3
+    ##  4    54770 20th century American              1
+    ##  5    54771 20th century American              6
+    ##  6    54772 20th century American              1
+    ##  7    54773 20th century American              4
+    ##  8    54774 20th century American              1
+    ##  9    54775 20th century American              3
+    ## 10    54776 20th century American              7
+    ## # ℹ 90 more rows
+
+``` r
+#Creating a contingency table for culture and century  
+con_tbl_2 <- table(obj_tbl$culture, 
+                  obj_tbl$century)  
+#Printing out the contingency table 
+print(con_tbl_2)
+```
+
+    ##           
+    ##            11th-12th century 16th-17th century 18th century 19th-20th century 19th century 1st-2nd century CE 20th century 2nd-1st century BCE
+    ##   American                 0                 0            0                 1            0                  0           68                   0
+    ##   British                  0                 0            0                 0            1                  0            6                   0
+    ##   Chinese                  1                 0            0                 0            4                  1            0                   1
+    ##   Dutch                    0                 0            1                 0            0                  0            0                   0
+    ##   Etruscan                 0                 0            0                 0            0                  0            0                   0
+    ##   German                   0                 0            0                 0            0                  0            1                   0
+    ##   Greek                    0                 1            0                 0            0                  0            0                   0
+    ##   Italian                  0                 0            0                 0            3                  0            0                   0
+    ##   Korean                   1                 0            0                 2            0                  0            0                   0
+    ##   Polish                   0                 0            0                 0            0                  0            1                   0
+    ##   Roman                    0                 0            0                 0            0                  0            0                   0
+    ##           
+    ##            2nd-4th century CE 4th-3rd millennium BCE 4th century BCE 5th-4th century BCE 6th century 9th century
+    ##   American                  0                      0               0                   0           0           0
+    ##   British                   0                      0               0                   0           0           0
+    ##   Chinese                   0                      1               0                   0           1           1
+    ##   Dutch                     0                      0               0                   0           0           0
+    ##   Etruscan                  0                      0               1                   0           0           0
+    ##   German                    0                      0               0                   0           0           0
+    ##   Greek                     0                      0               1                   1           0           0
+    ##   Italian                   0                      0               0                   0           0           0
+    ##   Korean                    0                      0               0                   0           0           0
+    ##   Polish                    0                      0               0                   0           0           0
+    ##   Roman                     1                      0               0                   0           0           0
+
+``` r
+#Using person_gender() to pull only female records first
+pers_tbl <- find_people("1d505e26-5d36-4674-a35b-c40cab886778")  
+
+#Making a line plot off of the objectcount over time for each gender
+obj_cnt_plot2 <- ggplot(pers_tbl, aes(x = datebegin, y = objectcount, color = gender)) + 
+            geom_line()
+```
+
+``` r
+#Pull data from object API endpoint
+cent_views_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
+```
+
+    ## # A tibble: 100 × 4
+    ##    objectid century      culture  totalpageviews
+    ##       <int> <chr>        <chr>             <int>
+    ##  1    54767 20th century American              2
+    ##  2    54768 20th century American              2
+    ##  3    54769 20th century American              3
+    ##  4    54770 20th century American              1
+    ##  5    54771 20th century American              6
+    ##  6    54772 20th century American              1
+    ##  7    54773 20th century American              4
+    ##  8    54774 20th century American              1
+    ##  9    54775 20th century American              3
+    ## 10    54776 20th century American              7
+    ## # ℹ 90 more rows
+
+``` r
+#Make a scatterplot of the century versus the totalpageviews
+cent_views_plot3 <- ggplot(cent_views_tbl, aes(x = century, y = totalpageviews)) + 
+                             geom_histogram()
+```
+
+``` r
+#Pull data from the object API endpoint 
+cult_views_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
+```
+
+    ## # A tibble: 99 × 4
     ##    objectid century      culture  totalpageviews
     ##       <int> <chr>        <chr>             <int>
     ##  1    39114 20th century American              0
@@ -399,73 +602,36 @@ obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")
     ##  8    39121 20th century German                3
     ##  9    39122 20th century American              5
     ## 10    39123 20th century American             10
+    ## # ℹ 89 more rows
 
 ``` r
-#Must include the pagination function to get a large enough sample size  
-
-#Creating a contingency table for gender and datebegin  
-con_tbl_2 <- table(obj_tbl$culture, 
-                  obj_tbl$century)  
-#Printing out the contingency table 
-print(con_tbl_2)
+#Make a histogram for the totalpageviews per culture  
+cult_views_plot4 <- ggplot(cult_views_tbl, aes(x = culture, y = totalpageviews)) + 
+                              geom_jitter()
 ```
 
-    ##           
-    ##            20th century
-    ##   American            8
-    ##   German              2
-
 ``` r
-#Using person_gender() to pull only female records first
-pers_tbl <- find_people("1d505e26-5d36-4674-a35b-c40cab886778")  
-
-#Making a line plot off of the objectcount over time for each gender
-obj_cnt_plot2 <- ggplot(pers_tbl, aes(x = datebegin, y = objectcount, color = gender)) + 
-            geom_line()
+#Pull data from the object API endpoint 
+cult_views_tbl2 <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
 ```
 
-This first graph is a count plot of men and women over time. Bigger
-circles show that there are more of one gender throughout the dates.
-This plot is not perfect to show us the artists in their time, but can
-show us if there were more men or women at times based on their start
-date.
+    ## # A tibble: 99 × 4
+    ##    objectid century      culture  totalpageviews
+    ##       <int> <chr>        <chr>             <int>
+    ##  1    39114 20th century American              0
+    ##  2    39115 20th century American              0
+    ##  3    39116 20th century American              3
+    ##  4    39117 20th century American              0
+    ##  5    39118 20th century American              2
+    ##  6    39119 20th century American              5
+    ##  7    39120 20th century German                4
+    ##  8    39121 20th century German                3
+    ##  9    39122 20th century American              5
+    ## 10    39123 20th century American             10
+    ## # ℹ 89 more rows
 
 ``` r
-#I would use the find_people call to get the right data frame for this one
-#If provided the proper input, this would graph the count plot of the men and women during different datebegin
-  ggplot((aes(x = "gender", y = "datebegin"))) + 
-  geom_count(na.rm = TRUE, show.legend = TRUE) +
-  labs(x="Gender", y="Date They Began", title="Popular Starts for Men vs. Women")
-```
-
-This graph is a bar plot of the number of objects that men and women
-had. This is a very simple plot with two bars on it, but this is a
-visual to see the overall amounts of each.
-
-``` r
-#I would use find_people function and group_by(gender) to compare the objectcount from men to women
-#Plotting a bar graph
-ggplot(df, aes(x = gender, y = objectcount)) +
-  geom_bar() +
-  labs(x="Gender", y="Ojbect Count", title ="Who Has More")
-```
-
-Here I look at the center and spread of both the women and men’s object
-counts. This would directly answer my question of who takes up more
-space overall in the data base, but I would also point out that there
-were many records with “unknown” listed as their gender so these results
-don’t tell the whole story.
-
-``` r
-#I would grab the womens table from the person_gender function to gather those stats  
-womens_stats <- summary(clean_womens$objectcount)  
-
-#Printing out the stats
-print(womens_stats)  
-
-#Then I would grab the mens table from the person_gender function to get those stats  
-mens_stats <- summary(clean_mens)
-
-#Printing out mens stats  
-print(mens_stats)  
+#Make a dotplot to demonstrate the totalpageviews per culture  
+cult_views_plot5 <- ggplot(cult_views_tbl2, aes(x = culture, y = totalpageviews)) + 
+                              geom_dotplot()  
 ```

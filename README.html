@@ -625,6 +625,8 @@ R</li>
 <li><code>dplyr</code> to manipulate data</li>
 <li><code>tidyverse</code> to transform and present data</li>
 <li><code>ggplot2</code> to make graphics</li>
+<li><code>cowplot</code> to put plots on a grid for visual
+comparison</li>
 </ul>
 <h2 id="how-to-query-the-harvard-art-api">How to Query the Harvard Art
 API</h2>
@@ -658,27 +660,42 @@ unique with the multitude of options for the arguments.</p>
 function to help ease the process of gathering more information from the
 Harvard Art Museum API. This API does have a limit of 10,000 entries per
 API key so be wise in how you are grabbing data. The input includes your
-base URL, where you want to set your limit at (the default is 1,000 so
-you don’t query all in one spot, remember 10,000 is the limit set by the
-API and you cannot change that), and how many items you would like to
-see on each page.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co">#A while loop is a good fit to watch your limits. It only works while a condition is true.</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>more_pages <span class="ot">&lt;-</span> <span class="cf">function</span>(my_URL, <span class="at">limit =</span> <span class="dv">1000</span>, items_per_page){</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="co">#Setting up all other variables for this function  </span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="co">#Setting this at zero for when you begin to query  </span></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  items_received <span class="ot">&lt;-</span> <span class="dv">0</span>  </span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  </span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="co">#This variable is telling R what page we are on  </span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  on_page <span class="ot">&lt;-</span> <span class="dv">1</span>  </span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  </span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  <span class="co">#Here is the conditional while loop  </span></span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  <span class="cf">while</span> (items_received <span class="sc">&lt;</span> limit){</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>    <span class="co">#Creating another with page number in the URL  </span></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>    page_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(my_URL, <span class="st">&quot;?page=&quot;</span>, on_page)</span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>  }</span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>  </span>
+base URL, where you want to set your limit at (the default is 100 so you
+don’t query all in one spot, remember 10,000 is the limit set by the API
+and you cannot change that), and how many items you would like to see on
+each page.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co">#This is what my best attempt at the pagination function would be. In my attempts to merge it with my other functions I decided to simply add a &amp;size= to the URL calls so that I could get enough data. I changed the size of the functions that I use in my EDA to higher numbers so that I could get the graphs that I wanted </span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#A while loop is a good fit to watch your limits. It only works while a condition is true.</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>more_pages <span class="ot">&lt;-</span> <span class="cf">function</span>(my_URL, <span class="at">limit =</span> <span class="dv">100</span>, <span class="at">items_per_page =</span> <span class="dv">10</span>){</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="co">#Setting up all other variables for this function  </span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="co">#Setting this at zero for when you begin to query  </span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  items_received <span class="ot">&lt;-</span> <span class="dv">0</span>  </span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  </span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="co">#This variable is telling R what page we are on  </span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  on_page <span class="ot">&lt;-</span> <span class="dv">1</span>  </span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  </span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  <span class="co">#Here is the conditional while loop  </span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>  <span class="cf">while</span> (items_received <span class="sc">&lt;</span> limit){</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>  <span class="co">#Creating another with page number in the URL  </span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>  page_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(my_URL, <span class="st">&quot;?page=&quot;</span>, on_page)</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>   </span>
 <span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>  </span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  <span class="co">#Getting data from the URL  </span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>  response <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(page_URL)  </span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>  </span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>  <span class="co">#Saving the items on the page  </span></span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>  items <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">content</span>(response)[[<span class="st">&quot;items&quot;</span>]]  </span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>  </span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>  <span class="co">#Adding the number of new items to the total items received so far</span></span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>  items_received <span class="ot">&lt;-</span> items_received <span class="sc">+</span> <span class="fu">length</span>(items)  </span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>  </span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>  <span class="co">#Tracking what page of data it is on  </span></span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>  on_page <span class="ot">&lt;-</span> on_page <span class="sc">+</span> <span class="dv">1</span>  </span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>  }</span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a>  </span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a>  <span class="co">#Letting the user know how many items they have called for from the API  </span></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a>  <span class="fu">return</span>(items_received)</span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a>}</span></code></pre></div>
 <p><code>object_info</code></p>
 <p>If you’re a little lost in where to start your search I have also
 made some other functions to query more specific endpoints of the
@@ -694,9 +711,9 @@ the end result should be a table of object information.</p>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>object_info <span class="ot">&lt;-</span> <span class="cf">function</span>(key){</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="co">#Providing the base URL  </span></span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  base_URL <span class="ot">&lt;-</span> <span class="st">&quot;https://api.harvardartmuseums.org/object?apikey=&quot;</span>  </span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  </span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a></span>
 <span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="co">#Pasting together the API</span></span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  object_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(base_URL, key)  </span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  object_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(base_URL, key,<span class="st">&quot;&amp;size=200&quot;</span>)  </span>
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  </span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="co">#Pulling data from the API</span></span>
 <span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  my_data <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(object_URL)  </span>
@@ -728,7 +745,7 @@ the culture name which should be specified in quotations.</p>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  base_URL <span class="ot">&lt;-</span> <span class="st">&quot;https://api.harvardartmuseums.org/object?apikey=&quot;</span>  </span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a> </span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="co">#Pasting together the API</span></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  cult_obj_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(base_URL,key,<span class="st">&quot;&amp;q=culture:&quot;</span>,culture)  </span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  cult_obj_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(base_URL,key,<span class="st">&quot;&amp;q=culture:&quot;</span>,culture,<span class="st">&quot;&amp;size=50&quot;</span>)  </span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  </span>
 <span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  <span class="co">#Pulling data from the API</span></span>
 <span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  my_data <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(cult_obj_URL)  </span>
@@ -760,7 +777,7 @@ the format of: “14th century BCE” or “6th millennium BCE”.</p>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  base_URL <span class="ot">&lt;-</span> <span class="st">&quot;https://api.harvardartmuseums.org/object?apikey=&quot;</span>  </span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  </span>
 <span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="co">#Pasting together the API</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  cent_obj_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(base_URL,key,<span class="st">&quot;&amp;q=century:&quot;</span>,century)  </span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  cent_obj_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(base_URL,key,<span class="st">&quot;&amp;q=century:&quot;</span>,century,<span class="st">&quot;&amp;size=50&quot;</span>)  </span>
 <span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  </span>
 <span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="co">#Pulling data from the API</span></span>
 <span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  my_data <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(cent_obj_URL)  </span>
@@ -794,7 +811,7 @@ result.</p>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  base_URL <span class="ot">&lt;-</span> <span class="st">&quot;https://api.harvardartmuseums.org/person?apikey=&quot;</span>  </span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>  </span>
 <span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="co">#Pasting together the API</span></span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  person_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(base_URL, key)  </span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  person_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(base_URL, key,<span class="st">&quot;&amp;size=200&quot;</span>)  </span>
 <span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  </span>
 <span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  <span class="co">#Pulling data from the API</span></span>
 <span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  my_data <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(person_URL)  </span>
@@ -817,34 +834,40 @@ result.</p>
 <span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>  <span class="co">#Returning the good table </span></span>
 <span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a>  <span class="fu">return</span>(pers_tbl)  </span>
 <span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a>}</span></code></pre></div>
-<p><code>cultured_people</code></p>
-<p>Similar as before in <code>cultured_objects</code>, this function
-allows for the addition of filtering through the cultures of each person
-in the API records. This function has a similar input and output will
-look the same as the <code>find_people</code> function except all
-records will be from one specific culture.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co">#Calling the API for people based on what culture they are from</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>find_people <span class="ot">&lt;-</span> <span class="cf">function</span>(key, culture){</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>my_data <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(<span class="st">&quot;https://api.harvardartmuseums.org/person?q=culture:&quot;</span>,culture,<span class="st">&quot;&amp;apikey=&quot;</span>,key,<span class="st">&quot;&amp;size=30&quot;</span>)  </span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#Turning this into a table that is readable in R</span></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>readable_table <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">rawToChar</span>(my_data<span class="sc">$</span>content))  </span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#Picking out the personid, displayname, gender, culture (to assure correctness), objectcount, and datebegin  </span></span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>selected_table <span class="ot">&lt;-</span> <span class="fu">select</span>(readable_table<span class="sc">$</span>records, personid, displayname, gender, culture, objectcount, datebegin)</span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>}</span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a></span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#Printing out the table a little nicer as a tibble  </span></span>
-<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>informational_table <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(selected_table)</span>
+<p><code>date_people</code></p>
+<p>This function allows the user to change the years that the
+<code>datebegin</code> looks at. In this function the user can specify
+<code>before</code> or <code>after</code> a <code>year_desired</code> so
+that the records of people will reflect this modification.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co">#Calling the API for people who have had something displayed at the Harvard Art Museum  </span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>date_people <span class="ot">&lt;-</span> <span class="cf">function</span>(key, when, year_desired){</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="co">#Providing the base URL  </span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  base_URL <span class="ot">&lt;-</span> <span class="st">&quot;https://api.harvardartmuseums.org/person?apikey=&quot;</span>  </span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  </span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="co">#Pasting together the API</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  date_pers_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(base_URL, key,<span class="st">&quot;&amp;&quot;</span>,when,<span class="st">&quot;=&quot;</span>,year_desired,<span class="st">&quot;&amp;size=50&quot;</span>)  </span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  </span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  <span class="co">#Pulling data from the API</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  my_data <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(date_pers_URL)  </span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>  </span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>  <span class="co">#Turning this into a table that is readable in R</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>  readable_table <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="fu">rawToChar</span>(my_data<span class="sc">$</span>content))  </span>
 <span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a></span>
-<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#Remove rows with NA  </span></span>
-<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>informational_table <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(informational_table)  </span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="co">#Picking out the personid, displayname, gender, objectcount, and datebegin  </span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  selected_table <span class="ot">&lt;-</span> <span class="fu">select</span>(readable_table<span class="sc">$</span>records, personid, displayname, gender, objectcount, datebegin)</span>
 <span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a></span>
-<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#Remove the rows with unknowns in them</span></span>
-<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>clean_tbl <span class="ot">&lt;-</span> informational_table[<span class="sc">-</span><span class="fu">row</span>(informational_table)[informational_table <span class="sc">==</span> <span class="st">&quot;unknown&quot;</span>],]  </span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  <span class="co">#Printing out the table a little nicer as a tibble  </span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  informational_table <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(selected_table)</span>
 <span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a></span>
-<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#Returning the cleaned table </span></span>
-<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="fu">print</span>(clean_tbl)</span></code></pre></div>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>  <span class="co">#Remove rows with NA  </span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>  informational_table <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(informational_table)  </span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>  </span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>  <span class="co">#Remove the rows with subset() to clean the data some </span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>  date_pers_tbl <span class="ot">&lt;-</span> <span class="fu">subset</span>(informational_table, (gender <span class="sc">!=</span> <span class="st">&quot;unknown&quot;</span> <span class="sc">&amp;</span> objectcount <span class="sc">!=</span> <span class="dv">0</span> <span class="sc">&amp;</span> datebegin <span class="sc">!=</span> <span class="dv">0</span>))  </span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>  </span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a>  <span class="co">#Returning the good table </span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a>  <span class="fu">return</span>(date_pers_tbl)  </span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a>}</span></code></pre></div>
 <p><code>person_gender</code></p>
 <p>My personal favorite would be this <code>person_gender</code>
 function. I could see a lot of good data analysis coming from comparing
@@ -857,7 +880,7 @@ male data or all the female data.</p>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  base_URL <span class="ot">&lt;-</span> <span class="st">&quot;https://api.harvardartmuseums.org/person?apikey=&quot;</span>  </span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  </span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="co">#Pasting together the API</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  gen_pers_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(base_URL,key,<span class="st">&quot;&amp;q=gender:&quot;</span>,gender)  </span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  gen_pers_URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(base_URL,key,<span class="st">&quot;&amp;q=gender:&quot;</span>,gender,<span class="st">&quot;&amp;size=200&quot;</span>)  </span>
 <span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  </span>
 <span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  <span class="co">#Pulling data from the API</span></span>
 <span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  my_data <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(gen_pers_URL)  </span>
@@ -888,15 +911,15 @@ today we hear how men take up most of different spaces and I want to see
 if that applies to art at the museum as well. Do men hold the most space
 at museums? Is there any time when there were more obejcts from women
 than men? What is the average amount of object per man or woman?</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co">#Using my find_people function to pull in data for this numerical summary  </span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>pers_tbl <span class="ot">&lt;-</span> <span class="fu">find_people</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>)  </span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co">#Must use the pagination function here to pull enough data to have a good sample amount  </span></span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#Selecting the specific columns I want to look at so summarise() does not clutter the table</span></span>
-<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>gen_summary <span class="ot">&lt;-</span> pers_tbl <span class="sc">%&gt;%</span> </span>
-<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>              <span class="fu">select</span>(gender, objectcount) <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co">#Had to make one specifically for the first 200 female and 200 males entries separately because there is so much data, but each user has a limit of 10,000 and I am not trying to hit that. </span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co">#Using my person_gender function to pull in data for this numerical summary  </span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>fem_pers_tbl <span class="ot">&lt;-</span> <span class="fu">person_gender</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>, <span class="st">&quot;female&quot;</span>)  </span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#Doing the same for men  </span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>mal_pers_tbl <span class="ot">&lt;-</span> <span class="fu">person_gender</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>, <span class="st">&quot;male&quot;</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co">#Selecting the specific columns I want to look at so summarise() does not clutter the table</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>fem_gen_summary <span class="ot">&lt;-</span> fem_pers_tbl <span class="sc">%&gt;%</span> </span>
 <span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>              <span class="fu">group_by</span>(gender) <span class="sc">%&gt;%</span> </span>
 <span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>              <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">mean</span>(objectcount),</span>
 <span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>                       <span class="at">sd =</span> <span class="fu">sd</span>(objectcount),</span>
@@ -904,31 +927,182 @@ than men? What is the average amount of object per man or woman?</p>
 <span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>                       <span class="at">max =</span> <span class="fu">max</span>(objectcount),</span>
 <span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>                       <span class="at">IQR =</span> <span class="fu">IQR</span>(objectcount))  </span>
 <span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a></span>
-<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co">#Printing the summaries table</span></span>
-<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="fu">print</span>(gen_summary)  </span></code></pre></div>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co">#Doing the same for the male statistics</span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>mal_gen_summary <span class="ot">&lt;-</span> mal_pers_tbl <span class="sc">%&gt;%</span> </span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>              <span class="fu">group_by</span>(gender) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a>              <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">mean</span>(objectcount),</span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a>                       <span class="at">sd =</span> <span class="fu">sd</span>(objectcount),</span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a>                       <span class="at">min =</span> <span class="fu">min</span>(objectcount),</span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a>                       <span class="at">max =</span> <span class="fu">max</span>(objectcount),</span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a>                       <span class="at">IQR =</span> <span class="fu">IQR</span>(objectcount))  </span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a><span class="co">#Printing the summaries table  </span></span>
+<span id="cb9-27"><a href="#cb9-27" tabindex="-1"></a><span class="fu">print</span>(fem_gen_summary)  </span></code></pre></div>
 <pre><code>## # A tibble: 1 × 6
 ##   gender  mean    sd   min   max   IQR
 ##   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
-## 1 male       2    NA     2     2     0</code></pre>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co">#Making a boxplot of the summary statistics for a more visual look  </span></span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>gen_plot1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> gen_summary, <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">&quot;gender&quot;</span>, <span class="at">y =</span> <span class="st">&quot;objectcount&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>         <span class="fu">geom_boxplot</span>()</span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co">#Using the finc_people function to pull data for the contingency table  </span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>pers_tbl <span class="ot">&lt;-</span> <span class="fu">find_people</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>)  </span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#Must include the pagination function to get a large enough sample size  </span></span>
-<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a></span>
-<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#Creating a contingency table for gender and datebegin  </span></span>
-<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>con_tbl_1 <span class="ot">&lt;-</span> <span class="fu">table</span>(pers_tbl<span class="sc">$</span>gender, </span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>                  pers_tbl<span class="sc">$</span>datebegin)  </span>
-<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#Printing out the contingency table </span></span>
-<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="fu">print</span>(con_tbl_1)</span></code></pre></div>
+## 1 female  4.78  12.8     1    81     2</code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co">#Printing the male summaries table  </span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="fu">print</span>(mal_gen_summary)  </span></code></pre></div>
+<pre><code>## # A tibble: 1 × 6
+##   gender  mean    sd   min   max   IQR
+##   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+## 1 male    12.5  21.6     1   120    13</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co">#Making a boxplot of the summary statistics for a more visual look  </span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>mal_gen_plot1 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(<span class="at">data =</span> mal_pers_tbl, <span class="fu">aes</span>(<span class="at">x =</span> gender, <span class="at">y =</span> objectcount)) <span class="sc">+</span></span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>         <span class="fu">geom_boxplot</span>() <span class="sc">+</span> </span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>         <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;How Many Objects per Man&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Male&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Object Count&quot;</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#Making the womens objectcount summaries boxplot  </span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>fem_gen_plot1 <span class="ot">&lt;-</span><span class="fu">ggplot</span>(<span class="at">data =</span> fem_pers_tbl, <span class="fu">aes</span>(<span class="at">x =</span> gender, <span class="at">y =</span> objectcount)) <span class="sc">+</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>         <span class="fu">geom_boxplot</span>() <span class="sc">+</span> </span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>         <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;How Many Objects per Woman&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Female&quot;</span>, <span class="at">y =</span> <span class="st">&quot;Object Count&quot;</span>)  </span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#Plotting the two plots side by side for better visual  </span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="fu">plot_grid</span>(mal_gen_plot1, fem_gen_plot1, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAAHgCAMAAABNUi8GAAABSlBMVEUAAAAAADoAAGYAOjoAOmYAOpAAZrYzMzM6AAA6ADo6AGY6OgA6Ojo6OmY6OpA6ZmY6ZpA6ZrY6kLY6kNtNTU1NTW5NTY5Nbo5NbqtNjshmAABmADpmAGZmOgBmOjpmOmZmOpBmZjpmZmZmkJBmkLZmkNtmtrZmtttmtv9uTU1uTW5uTY5ubo5ubqtuq+SOTU2OTW6OTY6Obk2ObquOyP+QOgCQOjqQOmaQZgCQZjqQZmaQkDqQkGaQkLaQtpCQttuQ27aQ29uQ2/+rbk2rbm6rbo6rjk2rq46ryKur5OSr5P+2ZgC2Zjq2kDq2kGa2tpC2ttu225C229u22/+2/7a2/9u2///Ijk3I///bkDrbtmbbtpDb27bb29vb/7bb///kq27k///r6+v/tmb/yI7/25D/27b/29v/5Kv//7b//8j//9v//+T///92ueMbAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAZVElEQVR4nO2d/38bR0KGlYRYLuWuLVZCYjg4rtA6LbGbQwYOyvWoUzhsjuMoxFYKtSPZRZa1//+vzMzuarXSSDtavfa8K7/Pp40UR19evXp2d3asXbUSIYhpxQ4gxDIkqKBGggpqJKigRoIKaiSooEaCCmokqKCmpqC9h2/c5fXuzvIbnvzoq+zad39acdOcm39/v9V69Bfn7uG3sh8W18pc/dmbsEddJ9Et0twiTx58bS96rcf2CW4O3QWeWxe0lb6O5Gq7FdbrDz9pOX7v25Be8yDhrJ7oNmlukYPW3lSuRQ+7Nrcu6IP301v0Hm0H9Xpz2PrQNPrDL+ySWf2yawi6aqJbpblFpg95vfuxS57pigciqF1WzXKaruZ7dgG/OcwKOXn4D9km4GPX61uz1Xnwl26T8Nv33bX0pU3eoF5r6oopYbA9tQqwT/Sjb+2/vjU//tq+CS1zs5tfmAf9NItmHmng/nHq9iZOr/Xw28BEd0lzi0xDDh78k0voXkcW36zkd95um0jm7h+ee7OGgxDU5DCYNX3Pru1PWlsuYt7r796zL/Hq939nf9RLtzp7aSPuWtrYINuA3RzmS/L17uPz691H2+lDu1td5U9k3gx3Je01e6y9/H4fZPcpbn9zaB4nGyRVJ7pLGlyki957fG4vna2T+Ffb9p4Pfmn/vrVmxXUFbeXs2Kf9NB0sX23bmlomcF6T6fW/D23FJ1u2atOaW8C27J22zs2dtuxNzAs9yV711LbI/Nw82B+e3/zG3Mr+/ObQLt3fuXubx39rVxG2navtj87dg2aPYB7Z3Wf69sW4LSDRHdLgIm1Iu4IfuIWjHN9ce2tf0tX24/P1KgYImr0is1dnX/zVe1+a15zXZMs5cWOgvWxd8L+//ftt95ptm67F/AV6e7WPY2/rHjp9BFPlZL2S9fro4/+cREvvY+9d3L5YnQQlukMaXKR9qnRJ2nFPXcR319zds537NSoGbOJtyCTdtpgKBw//a3evGPKbl2f/YZC9ynRb4bKmjW2lgScritle02bSt2yQvZW2gb3pICf2px9+W3oEc5/i9tOTIAGJ7pAGF5mGTFfaqd55fJcwvbtdqNaqGCuo+f9kywQoXndWzkm62Jqtxgf/+B/f75azZisHx+zQKajX5Ds7ozKJVCloZaK7o8FF2oXFPZ2568lWslDQ9SqGCJqv2s3VT8xAqff4N5MNgR0XmfH99p7rNX0N6XCkyDpofVJMsszufCbTW6a8zfKWyfE/f5eNvYutWXH7GUErE90dDS7ShnRPl11Ob+KnBV2vYoCgxeDY7uS9Zxf/96c3L+bvf+62AO4tOLeTEXbkXGS9OfyDfMM0N31n9x2mxvZfmX85tEMh+ybaAu3+7sDsAJhbZY9R7A9M374saFWiu6PBRZoff+AmFrLL6Z2ksqDrVAydZrLxXIPFRILt1e4OpgtrPs8wk7XXmqwozEOWfgHiZjrcY2wl+aZpJ7+253Yy8tmRye7ro+w+xe1nBa1MdGc0uMji6U7Su0xNM00Lul7FkIn6q2yC1r6SrenhTz71YRtwqd1U7lcn+aKYZZ3MbDhKv0K2c8U/nswv2yd65CaS326nM8rmXdg6d/PLH2XNpXPS6Ug/v/2soJWJ7owGF5mFnLq8Kibqp3eS1qqY4tNMAb8nC5+buOuJIiY2sEgGQX/4SfUnYcrrhmVw9BqFTSwyvqBmYFX98ZxewG0mj8fQawQ2s8j4gpox9EeVtzlJP3UQAkevEdjMIuMLKsQSJKigRoIKaiSooEaCCmokqKBmuaDDz8/MHy86nW6SXHQ6nadn6c/7NNBEqVd/7NQlqNIECXppjRx9cZwMPztOTruMvdJEkaBYQgQ9ffJrswa9fG6vdsevjxl7pYkiQbGECJpt4g1mLTo66LgtfZK02+1674aYI7YGJajS5A0FCTo+2ndb+claNHb6ApooEhTLKoKODvazv+fj0NjpC2iiSFAsKwg6fDHZPZKgC5GgWMIFzfy8fPYuGX+jaaZFSFAs4YLa+U+7e2Qun+Q78rHTF9BEkaBYwgTl75UmigTFIkHBSFAsEhSMBMUiQcFIUCwSFIwExSJBwUhQLBIUjATFsiGCttvt2BEymi8oT5eWzRC03aZptfGCEnVpkaBgJCgWCQpGgmLZDEGJxk0BrQ1fuIO6RgedZ+/YiuwzdWnZEEF59jyrS7MHd108ezc+6iYXz+mK7BN1aZGgYKpLG758l4xenZn/JofS0KR3UKWRoGCqS8vWoM7TL+wHF3VwVwASFERAa+ng037yOxWUqsg+UZcWCQqmujR72OHl07NiDUpVZJ+oS4sEBVNdWrbq1Bg0CAkKprq0bA1qj+HWXnwlEhRMQGuX6VFdrPOgPF1aJCiYWj3SpHdQpZGgYJovqH6TdBvQRGm8oPpd/K1AE0WCYpGgYCQoFgkKpvGCagx6K9BEab6gPF1aJCgYCYpFgoKRoFgkKBgJikWCgpGgWCQoGAmKZT1BBYjYGpSgSpM3pDUoCAmKRYKCkaBYNkRQnt9+SFAsmyEo0e+PJSgWCQpGgmKRoGAkKJbNEFRjUCRUaTZEUJ5SJSgWCQpGgmKRoGAkKBYJCkaCYpGgYCQoFgkKRoJikaBgJCgWCQpGgmKRoGAkKBYJCkaCYpGgYCQoFgkKRoJikaBgJCgWCQpGgmKRoGAkKBYJCkaCYpGgYCQoFgkKRoJikaBgJCgWCQqmnqCiCgkKol79sVOXoEojQcFIUCwSFIwExSJBwUhQLBIUjATFIkHBSFAsEhSMBMUiQcFIUCxhgg4/P0uS0UHn2bvJBVmvNFEkKJYgQS87T8+S8VE3uXieX7D1ShNFgmIJEfT0ya/NGnT06syuSbMLtl5pokhQLCGCppv44ct3yeiL4+zC/LDdbtd7N8QcsTUoQZUmb6ha0Mtnzszsgq1XmigSFEu4oHNrUKpeaaJIUCzhgmoMGoQExRIu6PhoP92L39de/BIkKJZwQTUPGoQExRImKH+vNFEkKBYJCkaCYpGgYCQoFgkKRoJikaBgJCgWCQpGgmKRoGAkKBYJCkaCYpGgYCQoFgkKRoJikaBgJCgWCQpGgmKRoGAkKBYJCkaCYpGgYCQoFgkKRoJikaBgJCgWCQpGgmKRoGAkKBYJCkaCYpGgYCQoFgkKRoJikaBgJCgWCQpGgmKRoGAkKBYJCiagtfFR58kx6yla+kRdWiQomIDWTrv2XJakp6ruE3VpkaBgqkuz5wfMLghPE9gn6tIiQcFUlzZ8+c92E69TVa+EBAVRXdrwRdfaSXqq6j5RlxYJCiZAUOpTVfeJurRIUDDVpY3+2pmpMWgQ6wkq6nDqNvGkp6rub5SgsdMX0EQJaG10YL8YTfOgQUhQMLV6pEnvoEojQcFIUCwSFIwExSJBwUhQLBIUjATFIkHBSFAsEhSMBMUiQcFIUCwSFIwExSJBwUhQLBIUjATFIkHBSFAsEhSMBMUiQcFIUCwSFIwExSJBwUhQLBsiaLvdjh0hQ4Ji2QxB220aQyUoFgkKRoJikaBgJCiWzRBUY1AkVGk2RFCeUiUoFgkKRoJikaBgJCgWCQpGgmKRoGAkKBYJCkaCYpGgYCQoFgkKRoJikaBgJCgWCQpGgmKRoGAkKBYJCkaCYgkX9KJj6brLp3SnVqeJIkGxhAtqsV+dctpl7JUmigTFspKg9ltTxq+PGXuliSJBsawkqP1SitGB29An+oI0JLE1KEGVJm8oRFD3tVPDz6bWorHTF9BEkaBYfIJe7+7Zi8HDN+UWLyffmpKPQ2OnL6CJ4rFvUZ8SNIBVBD3dn1yToIuQoFjmBe21crbKJaYbdrsaHX+jaaZFzLm3sE+xCp416CzZN59edOyXSafEtqGAJoqnuAV9ThM7dQmqND5Bw4mdvoAmSq0eadI7qNJ4Bb3adpukJWMmul5povhqqu4zduoSVGl8gt4cho6WYqcvoIniaSmgz9ipS1Cl8QkaMGai65UmiqcljUHXwCfozaEErY2npYA+Y6cuQZXGJ+jSGTvSXmmi+Gqq7jN26hJUaXyCXu+2tJNUF09LAX3GTl2CKo1P0HBipy+giVKrR5r0Dqo0EhSMBMXiE1Sb+DXwtKRN/Br4BM1q/eOvq/wkeiU0URZ2tbTP2KlLUKVZLGgyeHwuQVdmcVnL+oydugRVmmWCahNfgyWCahNfgyWCnmgNWoPFZS3rM3bqElRpfIJmg/oHGoPWwNNSQJ+xU5egSuMTNJzY6QtootTqkSa9gyqNBAUjQbH4BXWHKew0qVeaKN6eKvuMnboEVRqvoD27v3m9W21o7PQFNFG8flb2GTt1Cao0PkEDjkKk65UmiqclHdW5BhIUjATF4hNUm/g18NWkTXx9vIJqJ6k+3p60k1Qbv6ChxE5fQBOlVo806R1UaSQoGAmKxSOoG9PfHFb/Jp6pV5oo8yWF9Bk7dQmqNPOCXm2ng6WTgCPnYqcvoIky11FQn7FTl6BKMy/oydbslSb0ShNlrqOgPmOnLkGVZk7Q4iwDmgetw2xFYX3GTl2CKo0EBSNBscwJenOYz9f19IHlGsxWFNZn7NQlqNLMCZr+2qPUrARdgbmOgvqMnboEVZp5QZMT99Hv692AeabY6QtoosyXFNJn7NQlqNJ4BE1PZxlwwIcII6DP2BqUoEqTN6TfJIGo1SNNegdVGgkKRoJikaBgJCgWCQpGgmKRoGAkKBafoDrkYw08LemQjzWQoGAkKJZ5QVf56r7Y6Qtoosx15OtzfNR1X2w++Xbe2KlLUKWZF1RfQ7MWnpbm+7zodJ2kF8/piuwTdWnxCRpO7PQFNFFCahv+1c+7yejVWTL8nO5beftEXVq8gtrPNQR93Vzs9AU0UXw1zfQ5fv2vZu05fPku+37edrsdovX9piSo++x3iKGxbSigieKraabPi327ebffa559gTRTkX2iLi0+QbUXvwaelmb6NKvOcWkNSlVkn6hLiwQFUy3oRceyrzFoED5BdeqbNfDVNNenXYOOj/a1F1+NV9BkoFPf1MXb02yfmgcNxi9oKLHTF9BEqdUjTXoHVRoJCkaCYvEL2mu19gIO6iR6JTRRvD1V9hk7dQmqNF5BTx5/v7unedBa+Gqq7jN26hJUaXyCXu/u2ZkRTTPVwdNSQJ+xU5egSiNBwUhQLD5Bk57dJGketBa+mqr7jJ26BFUar6CaB62Pt6fKPmOnLkGVxi9oKLHTF9BEqdUjTXoHVRoJCkaCYpkT1I3oJ0cpVGzmY6cvoIkyW1FYn7FTl6BKMydoiaod+djpC2iiLO1rYZ+xU5egSrNc0KsfL/9tUuz0BTRRlva1sM/YqUtQpfEL6vY6A46ci51+Qrvdjh0hw9tTZZ+xU5egSuMVtHGfB223aQz11aSvQqyPT9DmfaKeW1CduGENJCgYCYrFJ2haZcjpG2Knn0Djp3cTX91n7NQlqNLMCTo1aTezxNuDvZ6ekR6pQBNlVr3FfUrQEOYEXcxp1/5JesYWmijVPUrQVQgXdPzaHcNNerQsTRQJisUnqP9bKcymvdPRGVtqoG/5WIO8obnvSbranjlCYfjZsV2Lkp6xhSbKvHwL+pSgQcwLms+GePc6T7ukZ2yhiTJX2dI+JWgVc4Iu/27J067GoMuZbUzf1bkec4Iu/HZeu20ff3NGesYWmiiz6unbjtcjXFA7D/rkmPWMLTRRJCiWOUH1ddzrMVuRNvHrMSdo2KCerleaKHMdaSdpLeYFnUyL6KjOOsyXFNJn7NQlqNJ4BE0nlqs/ykTVK00UT0sBfcZOXYIqjU/QcGKnL6CJUqtHmvQOqjQSFIwExSJBwUhQLBIUjATFIkHBSFAsEhSMBMUiQcFIUCwSFIwExSJBwdQTVFQhQUHUqz926hJUaSQoGAmKRYKCkaBYJCgYCYpFgoKRoFgkKBgJikWCgpGgWDZEUO6z2zWoSAtVms0QlPv8oA0q0kGVRoKCkaBYJCgYCYplMwTVGBQJVZoNEZSnVAmKRYKCkaBYJCgYCYpFgoKRoFg2RFDtJAGhSrMZgmqaCQlVGgkKRoJikaBgJCiW9QSloelfiRNbgxJUafKGmr0GJSpVgmKRoGAkKBYJCkaCYpGgYCQolg0RlGYnXoKC2QxBNc2EhCqNBAUjQbFIUDASFMtmCKoxKBKqNBsiKE+pEhSLBAUjQbFIUDASFIsEBSNBsUhQMBIUiwQFI0GxSFAwEhSLBAUjQbFIUDASFIsEBSNBsUhQMBIUiwQFI0GxSFAwAa0NX3Q63SQZHXSevaMrsk/UpUWCgqkubfTFcTL87Hh81E0untMV2Sfq0iJBwVSXdmmtPO2OXp0lw8/P2IrsE3VpkaBgwooza9Hhy3duZdr8s07cCRIURFBv46P95PJZLihVkX2iLi0SFExIbaODfbOr9FKCBiBBwQS0NnzRtZZqDBqCBAUT6qfbzGsvvhIJCqa6tIuOpat50CAkKJhaPdKkd1Cl2RRBWY46lqBgJCgYCYpFgoKRoFhWEDT7jIMd4z+lmx2RoDio0oQLmn3GITntMvYqQXFQpQkXNPuMw/j1MWOvEhQGz3muLOGCWsxadHTgJvESss84EEWpQ2wNpiA6U6AlbyhIUPvLD7uVn6xFY6cvoKlUgmJZRVD3GQdHPg6Nnb6AplIJimUFQbPfIUvQpTRe0MaOQTM/7ccYx99ommkRzRe0qXvx+WcczOWTfEc+dvoCCYqDKk24oNy9SlAcVGkkKBgJikWCgpGgWCQoGAmKRYKCkaBYJCgYCYpFgoKRoFgkKBgJikWCgpGgWCQoGAmKRYKCkaBYJCgYCYpFgoKRoFgkKBgJikWCgpGgWCQoGAmKRYKCkaBYJCgYCYpFgoKRoFgkKBgJikWCgmm+oE097Ji7V5pOGy9oc0/cQN0rTaUSFIsEBSNBsUhQMI0X9N6PQdtNon6hzRX0vu/FN+lMnhI0OnlDEtTHnQkqqpCgPrQGjU7ekAT1cS8FrTX0vjXyhiSoj/soaM2dw9sib0iC+pCg0ckbqidoHRol6F09UWwNptgoQes8Y6MErV/oatQp8rag8lOCLkWCRidvSIL6uI+CahNf7y2MggSNTt6QBPUhQaOTNyRBfdxHQTUGrfcWRuE+Cqo1aL23MAoSNDp5QxLUhwSNTt6QBPVxHwXVGLTeWxiFeymoPm7XHCRodPKGJKiP+yko0xZegi5FgkYnb0iC+pCg0ckbkqA+JGh08oYkqA8JGp28IQnqQ4JGJ29IgvqQoNHJG5KgPiRodPKGJKgPCRqdvCEJ6kOCRidvSIL6kKDRyRuSoD4kaHTyhiSoDwkanbwhncDWS/1CJSgGCbqU+oXegaCxy1mZOi8ygqD13sIokAuKfbG3jgSFI0GRSFA45II2jTovMm9IgvqQoFDqvMi8IQnqg1xQ7Iu9dZoiaJOoX+jtFylBq6nV661AM3dX772r9VQStJJavd4KEpSfOxJ0dNB59i67XqvXW4EmSr33rtZTxR7/rMw6fQYLOj7qJhfPJegiwqXkXNL7RF1aVhZ09OosGX5+xtYrTZRgP0mX9D5Rl5aVBR2+fJeMvjg218w6O/jdEHOQLun9pgt6+SwXlKpXmijBgmpJX4kaa9BEgnoIbpx0Se8TdWlZWVDSLRNNlGBBSZf0PlGXlpUFHR/tM47taaIEC0q6pPeJurSsLCjp7AhNlOAeSZf0PlGXltUFnSZ2+gKaKOHlcS7pfaIuLRIUTK0eadI7qNJIUDASFIsEBSNBsUhQMBIUiwQFI0GxSFAwEhSLBAUjQbFIUDASFMt6gvKgzwPhoOxSgoocyi4lqMih7FKCihzKLpsuqNhwJKigRoIKaiSooEaCCmo2QdDJET4inPFRZ3/RvzEVKkHvKctKYyq0eYKOX/9Lp7N/2bErgOGLTqfr+hwddJ7ytMqP6evJcVoad6ENFPTouenxuW3RHl5uLmyfp1OHSooAitK4C22goK+P3f/ZyQ9Gr86yZu0B5yKUojTuQhsu6GnHbIhsnwedjtlmxc7WIIrSuAtttKCjg262RaJY2BtFURp3oY0W1I6Vhp8dZ0Omy8npEEQ1RWnchTZa0OSi0/mjn3eznU6GDVJzKErjLrR5gop7hQQV1EhQQY0EFdRIUEGNBBXUSFBBTeMEvdp++MZcXO8+Pp/86L2vIwZqHDeHLcfe0luxlNpAQR987S4kaE1uDncCbsVSagMF/Zntt/czCVoTCXqrXG1/8tPz5OZvvjSCXm2bLdWO69Jut9y2X1RRCJqVdvXeL02RO7bNvYSt1AYK+unfmk5//Pbx+fWu6bP38I3p8uZwy1wtVqpiMRNB89LccKnXsn88fMNWagMF3evtJYOdwePz/7PVmSLNfwO7oLtuRRXZTtJOkpdmKnW9ujLZSm2ioIOt5GRvYJfsgSn6ge2y18pKF5VM1qB5aW64WfzBVWoTBb3+6fd/8mZgN/Fmhz5d2GNviJpEIWhWWklQtlKbKGjyb19uJUbQdCXqFvbBA459ziYwETQvrSQoW6mNFLRnB1BGULusb7subw5NrxSF8jO1k5SWVhaUrNRGCmrLtEv6iRks/coM8rMZEfkZRHmaKd2gT61GyUptnKDifiFBBTUSVFAjQQU1ElRQI0EFNRJUUCNBBTUSVFAjQQU1/w9V3ziBu/1cXwAAAABJRU5ErkJggg==" /><!-- --></p>
+<p>These two boxplot show an interesting dynamic. Here we can see that
+the spread of how many object each male record has is larger than that
+of the female records. These numbers are further broken down in the
+numerical summaries of women (<code>fem_gen_summary</code>) and men
+(<code>mal_gen_summary</code>). In those numcerical summary tables women
+have on average a mean of about 4 objects and a maximum of 81 objects.
+In the men’s records, men have an average of about 12 objects and a
+maximum of 120 objects. These results are based off of about 200 of the
+entries for men and women each. To draw conclusions off of this small
+sample size, I would say that men take up more space than women in the
+Harvard Art Museum. Now these results do not address timing yet, but the
+sheer difference in average objects per man lead me to believe that men
+in general hold more space in the museum.</p>
+<p>Next I want to address the time of when either gender is more
+popular. I made two contingency tables, one for each of the binary
+genders. In these tables I compared the frequency of the gender to each
+year recorded for <code>datebegin</code>. In the tables I expect to be
+abel to compare which year(s) were more popular for men or women based
+on the frequencies.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co">#Using the person_gender function to pull data for the contingency table for both men and women  </span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>fem_pers_tbl <span class="ot">&lt;-</span> <span class="fu">person_gender</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>, <span class="st">&quot;female&quot;</span>)  </span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#Doing the same for men  </span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>mal_pers_tbl <span class="ot">&lt;-</span> <span class="fu">person_gender</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>, <span class="st">&quot;male&quot;</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#Creating a contingency table for women and datebegin  </span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>fem_con_tbl_1 <span class="ot">&lt;-</span> <span class="fu">table</span>(fem_pers_tbl<span class="sc">$</span>gender, </span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>                  fem_pers_tbl<span class="sc">$</span>datebegin)  </span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#Creating a contingency table for men and datebegin  </span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>mal_con_tbl_2 <span class="ot">&lt;-</span> <span class="fu">table</span>(mal_pers_tbl<span class="sc">$</span>gender, </span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a>                  mal_pers_tbl<span class="sc">$</span>datebegin)  </span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a><span class="co">#Printing out the contingency table for women   </span></span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a><span class="fu">print</span>(fem_con_tbl_1)  </span></code></pre></div>
+<pre><code>##         
+##          1747 1820 1864 1876 1889 1891 1898 1900 1903 1907 1908 1912 1916 1922 1925 1926 1929 1930 1931 1933 1934 1935 1936 1937 1940 1941 1942 1943
+##   female    1    1    1    1    1    1    2    8    1    1    2    1    1    1    3    2    1    2    2    1    2    2    1    1    1    6    3    1
+##         
+##          1944 1945 1946 1950 1951 1952 1953 1954 1955 1957 1958 1960 1965 1990 1993
+##   female    3    3    1    1    3    3    1    1    1    1    1    1    1    1    1</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co">#Printing out the contingency table for men   </span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="fu">print</span>(mal_con_tbl_2)  </span></code></pre></div>
 <pre><code>##       
-##        1812
-##   male    1</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co">#Using the finc_people function to pull data for the contingency table  </span></span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>obj_tbl <span class="ot">&lt;-</span> <span class="fu">object_info</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>)  </span></code></pre></div>
-<pre><code>## # A tibble: 10 × 4
+##        -100 1500 1743 1767 1800 1805 1809 1812 1819 1822 1830 1841 1843 1848 1858 1865 1872 1874 1880 1883 1887 1894 1906 1912 1914 1920 1926 1928
+##   male    1    2    1    1    1    1    1    2    1    2    1    1    1    2    1    1    1    2    1    3    2    1    1    1    1    1    1    1
+##       
+##        1931 1932 1934 1935 1938 1939 1940 1941 1942 1943 1944 1945 1946 1947 1948 1949 1950 1951 1952 1953 1955 1956 1964 1966 1968 1969 1970 1976
+##   male    2    2    2    2    2    1    1    1    1    2    2    1    1    3    2    2    1    1    1    1    2    1    1    2    1    1    1    1
+##       
+##        1978 1979
+##   male    1    1</code></pre>
+<p>In the <code>mal_con_tbl_2</code> the most popular
+<code>datebegin</code> is in 1883 and 1947 with both of these years
+having a total of 3 men beginning then. In the
+<code>fem_con_tbl_1</code> table women had the most starts in 1900, and
+1941, with a total of 8 and 6, respectively. This is very interesting
+that women had more concentrated starts than men did. I would be very
+intrigued to figure out which records of women started during these time
+and what made this occur. These contingency tables are not the best as
+entries are removed due to NA values in other columns. Not all of the
+years are listed on both contingency tables so it is difficult to
+officially compare and draw conclusions. The only year with a high start
+date is in 1941. In 1941 there were 6 women who started, compared to 1
+man. Further data analysis is required to see which binary gender is
+more popular throughout each year.</p>
+<p>The next</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co">#Using the object_info function to pull data for the contingency table  </span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>obj_tbl <span class="ot">&lt;-</span> <span class="fu">object_info</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>)  </span></code></pre></div>
+<pre><code>## # A tibble: 100 × 4
+##    objectid century      culture  totalpageviews
+##       &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;             &lt;int&gt;
+##  1    54767 20th century American              2
+##  2    54768 20th century American              2
+##  3    54769 20th century American              3
+##  4    54770 20th century American              1
+##  5    54771 20th century American              6
+##  6    54772 20th century American              1
+##  7    54773 20th century American              4
+##  8    54774 20th century American              1
+##  9    54775 20th century American              3
+## 10    54776 20th century American              7
+## # ℹ 90 more rows</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="co">#Creating a contingency table for culture and century  </span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>con_tbl_2 <span class="ot">&lt;-</span> <span class="fu">table</span>(obj_tbl<span class="sc">$</span>culture, </span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>                  obj_tbl<span class="sc">$</span>century)  </span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="co">#Printing out the contingency table </span></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="fu">print</span>(con_tbl_2)</span></code></pre></div>
+<pre><code>##           
+##            11th-12th century 16th-17th century 18th century 19th-20th century 19th century 1st-2nd century CE 20th century 2nd-1st century BCE
+##   American                 0                 0            0                 1            0                  0           68                   0
+##   British                  0                 0            0                 0            1                  0            6                   0
+##   Chinese                  1                 0            0                 0            4                  1            0                   1
+##   Dutch                    0                 0            1                 0            0                  0            0                   0
+##   Etruscan                 0                 0            0                 0            0                  0            0                   0
+##   German                   0                 0            0                 0            0                  0            1                   0
+##   Greek                    0                 1            0                 0            0                  0            0                   0
+##   Italian                  0                 0            0                 0            3                  0            0                   0
+##   Korean                   1                 0            0                 2            0                  0            0                   0
+##   Polish                   0                 0            0                 0            0                  0            1                   0
+##   Roman                    0                 0            0                 0            0                  0            0                   0
+##           
+##            2nd-4th century CE 4th-3rd millennium BCE 4th century BCE 5th-4th century BCE 6th century 9th century
+##   American                  0                      0               0                   0           0           0
+##   British                   0                      0               0                   0           0           0
+##   Chinese                   0                      1               0                   0           1           1
+##   Dutch                     0                      0               0                   0           0           0
+##   Etruscan                  0                      0               1                   0           0           0
+##   German                    0                      0               0                   0           0           0
+##   Greek                     0                      0               1                   1           0           0
+##   Italian                   0                      0               0                   0           0           0
+##   Korean                    0                      0               0                   0           0           0
+##   Polish                    0                      0               0                   0           0           0
+##   Roman                     1                      0               0                   0           0           0</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co">#Using person_gender() to pull only female records first</span></span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>pers_tbl <span class="ot">&lt;-</span> <span class="fu">find_people</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>)  </span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a><span class="co">#Making a line plot off of the objectcount over time for each gender</span></span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a>obj_cnt_plot2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(pers_tbl, <span class="fu">aes</span>(<span class="at">x =</span> datebegin, <span class="at">y =</span> objectcount, <span class="at">color =</span> gender)) <span class="sc">+</span> </span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a>            <span class="fu">geom_line</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="co">#Pull data from object API endpoint</span></span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>cent_views_tbl <span class="ot">&lt;-</span> <span class="fu">object_info</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>)  </span></code></pre></div>
+<pre><code>## # A tibble: 100 × 4
+##    objectid century      culture  totalpageviews
+##       &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;             &lt;int&gt;
+##  1    54767 20th century American              2
+##  2    54768 20th century American              2
+##  3    54769 20th century American              3
+##  4    54770 20th century American              1
+##  5    54771 20th century American              6
+##  6    54772 20th century American              1
+##  7    54773 20th century American              4
+##  8    54774 20th century American              1
+##  9    54775 20th century American              3
+## 10    54776 20th century American              7
+## # ℹ 90 more rows</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="co">#Make a scatterplot of the century versus the totalpageviews</span></span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>cent_views_plot3 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(cent_views_tbl, <span class="fu">aes</span>(<span class="at">x =</span> century, <span class="at">y =</span> totalpageviews)) <span class="sc">+</span> </span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>                             <span class="fu">geom_histogram</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="co">#Pull data from the object API endpoint </span></span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>cult_views_tbl <span class="ot">&lt;-</span> <span class="fu">object_info</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>)  </span></code></pre></div>
+<pre><code>## # A tibble: 99 × 4
 ##    objectid century      culture  totalpageviews
 ##       &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;             &lt;int&gt;
 ##  1    39114 20th century American              0
@@ -940,58 +1114,30 @@ than men? What is the average amount of object per man or woman?</p>
 ##  7    39120 20th century German                4
 ##  8    39121 20th century German                3
 ##  9    39122 20th century American              5
-## 10    39123 20th century American             10</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co">#Must include the pagination function to get a large enough sample size  </span></span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="co">#Creating a contingency table for gender and datebegin  </span></span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>con_tbl_2 <span class="ot">&lt;-</span> <span class="fu">table</span>(obj_tbl<span class="sc">$</span>culture, </span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>                  obj_tbl<span class="sc">$</span>century)  </span>
-<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a><span class="co">#Printing out the contingency table </span></span>
-<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="fu">print</span>(con_tbl_2)</span></code></pre></div>
-<pre><code>##           
-##            20th century
-##   American            8
-##   German              2</code></pre>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co">#Using person_gender() to pull only female records first</span></span>
-<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>pers_tbl <span class="ot">&lt;-</span> <span class="fu">find_people</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>)  </span>
-<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="co">#Making a line plot off of the objectcount over time for each gender</span></span>
-<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>obj_cnt_plot2 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(pers_tbl, <span class="fu">aes</span>(<span class="at">x =</span> datebegin, <span class="at">y =</span> objectcount, <span class="at">color =</span> gender)) <span class="sc">+</span> </span>
-<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>            <span class="fu">geom_line</span>()</span></code></pre></div>
-<p>This first graph is a count plot of men and women over time. Bigger
-circles show that there are more of one gender throughout the dates.
-This plot is not perfect to show us the artists in their time, but can
-show us if there were more men or women at times based on their start
-date.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="co">#I would use the find_people call to get the right data frame for this one</span></span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="co">#If provided the proper input, this would graph the count plot of the men and women during different datebegin</span></span>
-<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>  <span class="fu">ggplot</span>((<span class="fu">aes</span>(<span class="at">x =</span> <span class="st">&quot;gender&quot;</span>, <span class="at">y =</span> <span class="st">&quot;datebegin&quot;</span>))) <span class="sc">+</span> </span>
-<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>  <span class="fu">geom_count</span>(<span class="at">na.rm =</span> <span class="cn">TRUE</span>, <span class="at">show.legend =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
-<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">&quot;Gender&quot;</span>, <span class="at">y=</span><span class="st">&quot;Date They Began&quot;</span>, <span class="at">title=</span><span class="st">&quot;Popular Starts for Men vs. Women&quot;</span>)</span></code></pre></div>
-<p>This graph is a bar plot of the number of objects that men and women
-had. This is a very simple plot with two bars on it, but this is a
-visual to see the overall amounts of each.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="co">#I would use find_people function and group_by(gender) to compare the objectcount from men to women</span></span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="co">#Plotting a bar graph</span></span>
-<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> gender, <span class="at">y =</span> objectcount)) <span class="sc">+</span></span>
-<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
-<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x=</span><span class="st">&quot;Gender&quot;</span>, <span class="at">y=</span><span class="st">&quot;Ojbect Count&quot;</span>, <span class="at">title =</span><span class="st">&quot;Who Has More&quot;</span>)</span></code></pre></div>
-<p>Here I look at the center and spread of both the women and men’s
-object counts. This would directly answer my question of who takes up
-more space overall in the data base, but I would also point out that
-there were many records with “unknown” listed as their gender so these
-results don’t tell the whole story.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="co">#I would grab the womens table from the person_gender function to gather those stats  </span></span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>womens_stats <span class="ot">&lt;-</span> <span class="fu">summary</span>(clean_womens<span class="sc">$</span>objectcount)  </span>
-<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a></span>
-<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a><span class="co">#Printing out the stats</span></span>
-<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a><span class="fu">print</span>(womens_stats)  </span>
-<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a></span>
-<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a><span class="co">#Then I would grab the mens table from the person_gender function to get those stats  </span></span>
-<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a>mens_stats <span class="ot">&lt;-</span> <span class="fu">summary</span>(clean_mens)</span>
-<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a></span>
-<span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a><span class="co">#Printing out mens stats  </span></span>
-<span id="cb21-11"><a href="#cb21-11" tabindex="-1"></a><span class="fu">print</span>(mens_stats)  </span></code></pre></div>
+## 10    39123 20th century American             10
+## # ℹ 89 more rows</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="co">#Make a histogram for the totalpageviews per culture  </span></span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a>cult_views_plot4 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(cult_views_tbl, <span class="fu">aes</span>(<span class="at">x =</span> culture, <span class="at">y =</span> totalpageviews)) <span class="sc">+</span> </span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>                              <span class="fu">geom_jitter</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co">#Pull data from the object API endpoint </span></span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>cult_views_tbl2 <span class="ot">&lt;-</span> <span class="fu">object_info</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>)  </span></code></pre></div>
+<pre><code>## # A tibble: 99 × 4
+##    objectid century      culture  totalpageviews
+##       &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;             &lt;int&gt;
+##  1    39114 20th century American              0
+##  2    39115 20th century American              0
+##  3    39116 20th century American              3
+##  4    39117 20th century American              0
+##  5    39118 20th century American              2
+##  6    39119 20th century American              5
+##  7    39120 20th century German                4
+##  8    39121 20th century German                3
+##  9    39122 20th century American              5
+## 10    39123 20th century American             10
+## # ℹ 89 more rows</code></pre>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co">#Make a dotplot to demonstrate the totalpageviews per culture  </span></span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>cult_views_plot5 <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(cult_views_tbl2, <span class="fu">aes</span>(<span class="at">x =</span> culture, <span class="at">y =</span> totalpageviews)) <span class="sc">+</span> </span>
+<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a>                              <span class="fu">geom_dotplot</span>()  </span></code></pre></div>
 
 </body>
 </html>
