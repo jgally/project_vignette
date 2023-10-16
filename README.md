@@ -497,20 +497,20 @@ questions about the spread of culture throughout time.
 obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
 ```
 
-    ## # A tibble: 99 × 4
-    ##    objectid century      culture  totalpageviews
-    ##       <int> <chr>        <chr>             <int>
-    ##  1    39114 20th century American              0
-    ##  2    39115 20th century American              0
-    ##  3    39116 20th century American              3
-    ##  4    39117 20th century American              0
-    ##  5    39118 20th century American              2
-    ##  6    39119 20th century American              5
-    ##  7    39120 20th century German                4
-    ##  8    39121 20th century German                3
-    ##  9    39122 20th century American              5
-    ## 10    39123 20th century American             10
-    ## # ℹ 89 more rows
+    ## # A tibble: 100 × 4
+    ##    objectid century      culture totalpageviews
+    ##       <int> <chr>        <chr>            <int>
+    ##  1   161783 20th century German?              2
+    ##  2   161784 20th century German?              2
+    ##  3   161785 20th century German?              5
+    ##  4   161786 20th century German?              4
+    ##  5   161787 20th century German?              2
+    ##  6   161788 20th century German?              2
+    ##  7   161789 20th century German?              5
+    ##  8   161790 20th century German?              2
+    ##  9   161791 20th century German?              2
+    ## 10   161792 20th century German?              2
+    ## # ℹ 90 more rows
 
 ``` r
 #Creating a contingency table for culture and century  
@@ -522,8 +522,9 @@ print(con_tbl_3)
 
     ##           
     ##            20th century
-    ##   American           31
-    ##   German             68
+    ##   American           64
+    ##   German              5
+    ##   German?            31
 
 The results of the `con_tbl_3` were slightly disappointing. In adhereing
 to my API request limit of a sample size of 200 at any given time, not
@@ -590,18 +591,18 @@ obj_tbl3 <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")
 ```
 
     ## # A tibble: 99 × 4
-    ##    objectid century      culture  totalpageviews
-    ##       <int> <chr>        <chr>             <int>
-    ##  1    39114 20th century American              0
-    ##  2    39115 20th century American              0
-    ##  3    39116 20th century American              3
-    ##  4    39117 20th century American              0
-    ##  5    39118 20th century American              2
-    ##  6    39119 20th century American              5
-    ##  7    39120 20th century German                4
-    ##  8    39121 20th century German                3
-    ##  9    39122 20th century American              5
-    ## 10    39123 20th century American             10
+    ##    objectid century           culture  totalpageviews
+    ##       <int> <chr>             <chr>             <int>
+    ##  1     5132 20th century      American             22
+    ##  2     5133 20th century      American             20
+    ##  3     5134 20th century      American             19
+    ##  4     5135 20th century      American             17
+    ##  5     5136 19th-20th century British              28
+    ##  6     5137 19th-20th century French              112
+    ##  7     5138 20th century      American              9
+    ##  8     5139 19th-20th century French               45
+    ##  9     5140 19th century      French               73
+    ## 10     5141 19th century      French               26
     ## # ℹ 89 more rows
 
 ``` r
@@ -636,24 +637,24 @@ guesses for the most viewed culture.
 obj_tbl4 <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
 ```
 
-    ## # A tibble: 99 × 4
-    ##    objectid century      culture  totalpageviews
-    ##       <int> <chr>        <chr>             <int>
-    ##  1    39114 20th century American              0
-    ##  2    39115 20th century American              0
-    ##  3    39116 20th century American              3
-    ##  4    39117 20th century American              0
-    ##  5    39118 20th century American              2
-    ##  6    39119 20th century American              5
-    ##  7    39120 20th century German                4
-    ##  8    39121 20th century German                3
-    ##  9    39122 20th century American              5
-    ## 10    39123 20th century American             10
-    ## # ℹ 89 more rows
+    ## # A tibble: 100 × 4
+    ##    objectid century      culture totalpageviews
+    ##       <int> <chr>        <chr>            <int>
+    ##  1   161783 20th century German?              2
+    ##  2   161784 20th century German?              2
+    ##  3   161785 20th century German?              5
+    ##  4   161786 20th century German?              4
+    ##  5   161787 20th century German?              2
+    ##  6   161788 20th century German?              2
+    ##  7   161789 20th century German?              5
+    ##  8   161790 20th century German?              2
+    ##  9   161791 20th century German?              2
+    ## 10   161792 20th century German?              2
+    ## # ℹ 90 more rows
 
 ``` r
 #Make a histogram for the totalpageviews per culture  
-cult_views_plot4 <- ggplot(obj_tbl4, aes(x = culture, y = totalpageviews)) + 
+cult_views_plot4 <- ggplot(obj_tbl3, aes(x = culture, y = totalpageviews)) + 
                               geom_jitter(aes(fill = culture, color = culture)) + 
                               labs(title = "Total Views Per Culture", x = "Culture", y = "Total Online Page Views")  
 #Returning the plot  
@@ -681,31 +682,31 @@ culture and a high outlier in American culture.
 
 ``` r
 #Including the call again so that the plots render correctly  
-obj_tbl5 <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
+obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
 ```
 
     ## # A tibble: 100 × 4
-    ##    objectid century      culture  totalpageviews
-    ##       <int> <chr>        <chr>             <int>
-    ##  1    54767 20th century American              2
-    ##  2    54768 20th century American              2
-    ##  3    54769 20th century American              3
-    ##  4    54770 20th century American              1
-    ##  5    54771 20th century American              6
-    ##  6    54772 20th century American              1
-    ##  7    54773 20th century American              4
-    ##  8    54774 20th century American              1
-    ##  9    54775 20th century American              3
-    ## 10    54776 20th century American              7
+    ##    objectid century      culture totalpageviews
+    ##       <int> <chr>        <chr>            <int>
+    ##  1   161783 20th century German?              2
+    ##  2   161784 20th century German?              2
+    ##  3   161785 20th century German?              5
+    ##  4   161786 20th century German?              4
+    ##  5   161787 20th century German?              2
+    ##  6   161788 20th century German?              2
+    ##  7   161789 20th century German?              5
+    ##  8   161790 20th century German?              2
+    ##  9   161791 20th century German?              2
+    ## 10   161792 20th century German?              2
     ## # ℹ 90 more rows
 
 ``` r
 #Make a dotplot to demonstrate the totalpageviews per culture  
-cult_views_plot5 <- ggplot(obj_tbl5, aes(x = culture, y = totalpageviews)) + 
+cult_views_plot5.5 <- ggplot(obj_tbl, aes(x = culture, y = totalpageviews)) + 
                               geom_dotplot(aes(fill = culture, color = culture), binaxis = "y", stackdir = "center") + 
                               labs(title = "More Descriptive Plot of Total Views Per Culture", x = "Culture", y = "Total Online Page Views")  
 #Returning the plot  
-cult_views_plot5  
+cult_views_plot5.5  
 ```
 
     ## Bin width defaults to 1/30 of the range of the data. Pick better value with `binwidth`.
