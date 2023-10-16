@@ -701,7 +701,7 @@ obj_tbl5 <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")
 
 ``` r
 #Make a dotplot to demonstrate the totalpageviews per culture  
-cult_views_plot5 <- ggplot(obj_tbl, aes(x = culture, y = totalpageviews)) + 
+cult_views_plot5 <- ggplot(obj_tbl5, aes(x = culture, y = totalpageviews)) + 
                               geom_dotplot(aes(fill = culture, color = culture), binaxis = "y", stackdir = "center") + 
                               labs(title = "More Descriptive Plot of Total Views Per Culture", x = "Culture", y = "Total Online Page Views")  
 #Returning the plot  
