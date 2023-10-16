@@ -931,16 +931,16 @@ than men? What is the average amount of object per man or woman?</p>
 <pre><code>## # A tibble: 10 × 4
 ##    objectid century      culture  totalpageviews
 ##       &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;             &lt;int&gt;
-##  1    54767 20th century American              2
-##  2    54768 20th century American              2
-##  3    54769 20th century American              3
-##  4    54770 20th century American              1
-##  5    54771 20th century American              6
-##  6    54772 20th century American              1
-##  7    54773 20th century American              4
-##  8    54774 20th century American              1
-##  9    54775 20th century American              3
-## 10    54776 20th century American              7</code></pre>
+##  1    39114 20th century American              0
+##  2    39115 20th century American              0
+##  3    39116 20th century American              3
+##  4    39117 20th century American              0
+##  5    39118 20th century American              2
+##  6    39119 20th century American              5
+##  7    39120 20th century German                4
+##  8    39121 20th century German                3
+##  9    39122 20th century American              5
+## 10    39123 20th century American             10</code></pre>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co">#Must include the pagination function to get a large enough sample size  </span></span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="co">#Creating a contingency table for gender and datebegin  </span></span>
@@ -950,7 +950,8 @@ than men? What is the average amount of object per man or woman?</p>
 <span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a><span class="fu">print</span>(con_tbl_2)</span></code></pre></div>
 <pre><code>##           
 ##            20th century
-##   American           10</code></pre>
+##   American            8
+##   German              2</code></pre>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co">#Using person_gender() to pull only female records first</span></span>
 <span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>pers_tbl <span class="ot">&lt;-</span> <span class="fu">find_people</span>(<span class="st">&quot;1d505e26-5d36-4674-a35b-c40cab886778&quot;</span>)  </span>
 <span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a></span>

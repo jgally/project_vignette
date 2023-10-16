@@ -389,16 +389,16 @@ obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")
     ## # A tibble: 10 × 4
     ##    objectid century      culture  totalpageviews
     ##       <int> <chr>        <chr>             <int>
-    ##  1    54767 20th century American              2
-    ##  2    54768 20th century American              2
-    ##  3    54769 20th century American              3
-    ##  4    54770 20th century American              1
-    ##  5    54771 20th century American              6
-    ##  6    54772 20th century American              1
-    ##  7    54773 20th century American              4
-    ##  8    54774 20th century American              1
-    ##  9    54775 20th century American              3
-    ## 10    54776 20th century American              7
+    ##  1    39114 20th century American              0
+    ##  2    39115 20th century American              0
+    ##  3    39116 20th century American              3
+    ##  4    39117 20th century American              0
+    ##  5    39118 20th century American              2
+    ##  6    39119 20th century American              5
+    ##  7    39120 20th century German                4
+    ##  8    39121 20th century German                3
+    ##  9    39122 20th century American              5
+    ## 10    39123 20th century American             10
 
 ``` r
 #Must include the pagination function to get a large enough sample size  
@@ -412,7 +412,8 @@ print(con_tbl_2)
 
     ##           
     ##            20th century
-    ##   American           10
+    ##   American            8
+    ##   German              2
 
 ``` r
 #Using person_gender() to pull only female records first
