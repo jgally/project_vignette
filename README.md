@@ -585,6 +585,26 @@ century. My guess would be that more recent pieces would be more
 popular.
 
 ``` r
+#Including the call again so that the plots render correctly  
+obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
+```
+
+    ## # A tibble: 99 × 4
+    ##    objectid century      culture  totalpageviews
+    ##       <int> <chr>        <chr>             <int>
+    ##  1    39114 20th century American              0
+    ##  2    39115 20th century American              0
+    ##  3    39116 20th century American              3
+    ##  4    39117 20th century American              0
+    ##  5    39118 20th century American              2
+    ##  6    39119 20th century American              5
+    ##  7    39120 20th century German                4
+    ##  8    39121 20th century German                3
+    ##  9    39122 20th century American              5
+    ## 10    39123 20th century American             10
+    ## # ℹ 89 more rows
+
+``` r
 #Make a scatterplot of the century versus the totalpageviews
 cent_views_plot3 <- ggplot(obj_tbl, aes(x = century, y = totalpageviews)) + 
                              geom_col(aes(fill = century, color = century)) + 
@@ -610,6 +630,26 @@ the most views. I would imagine that cultures rich in history and
 artistic skill would have more than other cultures. I am not a history
 buff, otherwise I might be able to name which ones would be my top
 guesses for the most viewed culture.
+
+``` r
+#Including the call again so that the plots render correctly  
+obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
+```
+
+    ## # A tibble: 100 × 4
+    ##    objectid century      culture  totalpageviews
+    ##       <int> <chr>        <chr>             <int>
+    ##  1    54767 20th century American              2
+    ##  2    54768 20th century American              2
+    ##  3    54769 20th century American              3
+    ##  4    54770 20th century American              1
+    ##  5    54771 20th century American              6
+    ##  6    54772 20th century American              1
+    ##  7    54773 20th century American              4
+    ##  8    54774 20th century American              1
+    ##  9    54775 20th century American              3
+    ## 10    54776 20th century American              7
+    ## # ℹ 90 more rows
 
 ``` r
 #Make a histogram for the totalpageviews per culture  
@@ -640,6 +680,26 @@ the jitter plot results, I should be seeing the highest views in Korean
 culture and a high outlier in American culture.
 
 ``` r
+#Including the call again so that the plots render correctly  
+obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
+```
+
+    ## # A tibble: 99 × 4
+    ##    objectid century      culture  totalpageviews
+    ##       <int> <chr>        <chr>             <int>
+    ##  1    39114 20th century American              0
+    ##  2    39115 20th century American              0
+    ##  3    39116 20th century American              3
+    ##  4    39117 20th century American              0
+    ##  5    39118 20th century American              2
+    ##  6    39119 20th century American              5
+    ##  7    39120 20th century German                4
+    ##  8    39121 20th century German                3
+    ##  9    39122 20th century American              5
+    ## 10    39123 20th century American             10
+    ## # ℹ 89 more rows
+
+``` r
 #Make a dotplot to demonstrate the totalpageviews per culture  
 cult_views_plot5 <- ggplot(obj_tbl, aes(x = culture, y = totalpageviews)) + 
                               geom_dotplot(aes(fill = culture, color = culture), binaxis = "y", stackdir = "center") + 
@@ -659,4 +719,5 @@ plot does show a more organized version of the jitter plot aside from
 the data points from American culture. Korea still has the highest views
 with American, and Roman in second and third place, respectively.
 Overall These last few plots with the coloring helped out tremendously
-to visual more of the data and understand even the overlapping points.
+to visual more of the data and understand even the overlapping data
+points
