@@ -438,12 +438,7 @@ which year(s) were more popular for men or women based on the
 frequencies.
 
 ``` r
-#Using the person_gender function to pull data for the contingency table for both men and women  
-fem_pers_tbl <- person_gender("1d505e26-5d36-4674-a35b-c40cab886778", "female")  
-
-#Doing the same for men  
-mal_pers_tbl <- person_gender("1d505e26-5d36-4674-a35b-c40cab886778", "male")
-
+#Still must pull both genders separately for better analysis
 #Creating a contingency table for women and datebegin  
 fem_con_tbl_1 <- table(fem_pers_tbl$gender, 
                   fem_pers_tbl$datebegin)  
@@ -492,146 +487,176 @@ compare and draw conclusions. The only year with a high start date is in
 data analysis is required to see which binary gender is more popular
 throughout each year.
 
-The next
+The next contingency table is one that compares the culture to the
+century. In this table, I should be able to see what century the work
+from a specific culture comes from. This is important to answer
+questions about the spread of culture throughout time.
 
 ``` r
 #Using the object_info function to pull data for the contingency table  
 obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
 ```
 
-    ## # A tibble: 100 × 4
+    ## # A tibble: 99 × 4
     ##    objectid century      culture  totalpageviews
     ##       <int> <chr>        <chr>             <int>
-    ##  1    54767 20th century American              2
-    ##  2    54768 20th century American              2
-    ##  3    54769 20th century American              3
-    ##  4    54770 20th century American              1
-    ##  5    54771 20th century American              6
-    ##  6    54772 20th century American              1
-    ##  7    54773 20th century American              4
-    ##  8    54774 20th century American              1
-    ##  9    54775 20th century American              3
-    ## 10    54776 20th century American              7
-    ## # ℹ 90 more rows
+    ##  1    39114 20th century American              0
+    ##  2    39115 20th century American              0
+    ##  3    39116 20th century American              3
+    ##  4    39117 20th century American              0
+    ##  5    39118 20th century American              2
+    ##  6    39119 20th century American              5
+    ##  7    39120 20th century German                4
+    ##  8    39121 20th century German                3
+    ##  9    39122 20th century American              5
+    ## 10    39123 20th century American             10
+    ## # ℹ 89 more rows
 
 ``` r
 #Creating a contingency table for culture and century  
-con_tbl_2 <- table(obj_tbl$culture, 
+con_tbl_3 <- table(obj_tbl$culture, 
                   obj_tbl$century)  
 #Printing out the contingency table 
-print(con_tbl_2)
+print(con_tbl_3)  
 ```
 
     ##           
-    ##            11th-12th century 16th-17th century 18th century 19th-20th century 19th century 1st-2nd century CE 20th century 2nd-1st century BCE
-    ##   American                 0                 0            0                 1            0                  0           68                   0
-    ##   British                  0                 0            0                 0            1                  0            6                   0
-    ##   Chinese                  1                 0            0                 0            4                  1            0                   1
-    ##   Dutch                    0                 0            1                 0            0                  0            0                   0
-    ##   Etruscan                 0                 0            0                 0            0                  0            0                   0
-    ##   German                   0                 0            0                 0            0                  0            1                   0
-    ##   Greek                    0                 1            0                 0            0                  0            0                   0
-    ##   Italian                  0                 0            0                 0            3                  0            0                   0
-    ##   Korean                   1                 0            0                 2            0                  0            0                   0
-    ##   Polish                   0                 0            0                 0            0                  0            1                   0
-    ##   Roman                    0                 0            0                 0            0                  0            0                   0
-    ##           
-    ##            2nd-4th century CE 4th-3rd millennium BCE 4th century BCE 5th-4th century BCE 6th century 9th century
-    ##   American                  0                      0               0                   0           0           0
-    ##   British                   0                      0               0                   0           0           0
-    ##   Chinese                   0                      1               0                   0           1           1
-    ##   Dutch                     0                      0               0                   0           0           0
-    ##   Etruscan                  0                      0               1                   0           0           0
-    ##   German                    0                      0               0                   0           0           0
-    ##   Greek                     0                      0               1                   1           0           0
-    ##   Italian                   0                      0               0                   0           0           0
-    ##   Korean                    0                      0               0                   0           0           0
-    ##   Polish                    0                      0               0                   0           0           0
-    ##   Roman                     1                      0               0                   0           0           0
+    ##            20th century
+    ##   American           31
+    ##   German             68
+
+The results of the `con_tbl_3` were slightly disappointing. In adhereing
+to my API request limit of a sample size of 200 at any given time, not
+too much of the data could be pulled from the API. This table resulted
+in showing that American and German work was taken from the 20th
+century. While the contingency table did what it was supposed to, my
+small sample size halted deep analysis of all cultures over time.
+
+Next, I made line plots of both binary genders to see the spread of
+their object counts over time. Essentially I wanted a visual display of
+the contingency table with the object counts throughout the different
+`datebegin` entries. This plot should show me when either gender was
+more popular and how many objects were from each year. I already know
+that men have on average more objects than women, but I would like to
+see the spread over the years. I expect the men to cover a longer range
+of time than women.
 
 ``` r
-#Using person_gender() to pull only female records first
-pers_tbl <- find_people("1d505e26-5d36-4674-a35b-c40cab886778")  
+#Both of the binary genders must be pulled separately due to the low sample sizes.
+#Making a line plot off of the objectcount over time for men
+mal_obj_cnt_plot2 <- ggplot(mal_pers_tbl, aes(x = datebegin, y = objectcount, color = gender)) + 
+            geom_line() + 
+            labs(title = "How Many Objects Men Have Based on Beginning Date", x = "Beginning Year", y = "Object Count")  
 
-#Making a line plot off of the objectcount over time for each gender
-obj_cnt_plot2 <- ggplot(pers_tbl, aes(x = datebegin, y = objectcount, color = gender)) + 
-            geom_line()
+#Making a line plot off of the objectcount over time for women
+fem_obj_cnt_plot2 <- ggplot(fem_pers_tbl, aes(x = datebegin, y = objectcount, color = gender)) + 
+            geom_line() + 
+            labs(title = "How Many Objects Women Have Based on Beginning Date", x = "Beginning Year", y = "Object Count")  
+
+#Printing the two graphs side by side for better comparison  
+plot_grid(mal_obj_cnt_plot2, fem_obj_cnt_plot2, ncol = 2)  
 ```
 
-``` r
-#Pull data from object API endpoint
-cent_views_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
-```
+![](README_files/figure-gfm/obejct_count_plot2-1.png)<!-- -->
 
-    ## # A tibble: 100 × 4
-    ##    objectid century      culture  totalpageviews
-    ##       <int> <chr>        <chr>             <int>
-    ##  1    54767 20th century American              2
-    ##  2    54768 20th century American              2
-    ##  3    54769 20th century American              3
-    ##  4    54770 20th century American              1
-    ##  5    54771 20th century American              6
-    ##  6    54772 20th century American              1
-    ##  7    54773 20th century American              4
-    ##  8    54774 20th century American              1
-    ##  9    54775 20th century American              3
-    ## 10    54776 20th century American              7
-    ## # ℹ 90 more rows
+These line plots show some interesting results. While the line plots
+might have a better scale if they were separated, together they show
+some interesting trends. As seen in the `mal_con_tbl_2` there is an
+interest data point that shows a male record containing a -100
+`datebegin` value. I am uncertain of what this value is for, but it
+should be removed for better data analysis. In the male line plot above,
+the range truly starts around the 1500s compared to the female line plot
+starting around 1750. Due to the one outlier point, the male line plot
+is more difficult to see, but the bulk of the graph is in the 1750-2000
+range like the female plot. Further research will be needed to see which
+record created the male outliers. The female line plot shows that women
+were most popular to start around the 1940s, as also seen in the female
+contingency table.
+
+Now I want to change gears a little and look at some other data more
+about the objects and how often they are viewed. What culture is the
+most viewed? When pulling from different cultures is this done over a
+large or more concentrated amount of time? Questions like these can be
+answered by using the object API calls. Here I create a column plot
+which is similar to a histogram or bar plot, but this plot handles a
+discrete variable of x and a continuous variable of y to better suit my
+data. The column plot compares the total number of online views to each
+century. My guess would be that more recent pieces would be more
+popular.
 
 ``` r
 #Make a scatterplot of the century versus the totalpageviews
-cent_views_plot3 <- ggplot(cent_views_tbl, aes(x = century, y = totalpageviews)) + 
-                             geom_histogram()
+cent_views_plot3 <- ggplot(obj_tbl, aes(x = century, y = totalpageviews)) + 
+                             geom_col(aes(fill = century, color = century)) + 
+                             labs(title = "Total Views Per Century", x = "Century", y = "Total Online Views")  
+#Returning the plot  
+cent_views_plot3
 ```
 
-``` r
-#Pull data from the object API endpoint 
-cult_views_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
-```
+![](README_files/figure-gfm/cent_views_plot3-1.png)<!-- -->
 
-    ## # A tibble: 99 × 4
-    ##    objectid century      culture  totalpageviews
-    ##       <int> <chr>        <chr>             <int>
-    ##  1    39114 20th century American              0
-    ##  2    39115 20th century American              0
-    ##  3    39116 20th century American              3
-    ##  4    39117 20th century American              0
-    ##  5    39118 20th century American              2
-    ##  6    39119 20th century American              5
-    ##  7    39120 20th century German                4
-    ##  8    39121 20th century German                3
-    ##  9    39122 20th century American              5
-    ## 10    39123 20th century American             10
-    ## # ℹ 89 more rows
+This plot is a great visual. Although the x-axis is a bit muddled with
+labels, the coloring legend helps immensely. The most popular centuries
+are 19th, 20th, and the 2nd-4th century CE. This plot confirms my idea
+that the more modern the object is, the more likely it is to have more
+views. The 2nd-4th century CE was a time period close to the rise of
+Rome and there was plenty of work that came from that era as well.
+
+Similar to before, I want to see the most viewed culture of the objects.
+My assumption would be that more commonly known cultures, i.e. Japanese
+over Coptic, would be viewed more than lesser known options. It would be
+interesting to see among the popular ones which culture comes out with
+the most views. I would imagine that cultures rich in history and
+artistic skill would have more than other cultures. I am not a history
+buff, otherwise I might be able to name which ones would be my top
+guesses for the most viewed culture.
 
 ``` r
 #Make a histogram for the totalpageviews per culture  
-cult_views_plot4 <- ggplot(cult_views_tbl, aes(x = culture, y = totalpageviews)) + 
-                              geom_jitter()
+cult_views_plot4 <- ggplot(obj_tbl, aes(x = culture, y = totalpageviews)) + 
+                              geom_jitter(aes(fill = culture, color = culture)) + 
+                              labs(title = "Total Views Per Culture", x = "Culture", y = "Total Online Page Views")  
+#Returning the plot  
+cult_views_plot4  
 ```
 
-``` r
-#Pull data from the object API endpoint 
-cult_views_tbl2 <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
-```
+![](README_files/figure-gfm/cult_views_plot4-1.png)<!-- -->
 
-    ## # A tibble: 99 × 4
-    ##    objectid century      culture  totalpageviews
-    ##       <int> <chr>        <chr>             <int>
-    ##  1    39114 20th century American              0
-    ##  2    39115 20th century American              0
-    ##  3    39116 20th century American              3
-    ##  4    39117 20th century American              0
-    ##  5    39118 20th century American              2
-    ##  6    39119 20th century American              5
-    ##  7    39120 20th century German                4
-    ##  8    39121 20th century German                3
-    ##  9    39122 20th century American              5
-    ## 10    39123 20th century American             10
-    ## # ℹ 89 more rows
+This jitter plot of the total views per culture is very interesting.
+Before adding the coloring aesthetic to the jitter arguments, this plot
+only showed American and German views, and there was one extremely high
+German view count. However, on this plot that single German outlier
+cannot be seen whereas there is a very high view count in the American
+section of the graph. I was also surprised that Korean culture had the
+highest view count out of all the displayed cultures. I would like to
+locate and single out what object that outlier might be, so that I can
+see what all the hype is about!
+
+My final plot is of a dot plot. I wanted a different visual to show off
+the same information as the previous scatterplot. I chose a dot plot to
+emphasis the frequency of the number of views in case some are being
+obscured in the more haphazard organization of a jitter plot. Based on
+the jitter plot results, I should be seeing the highest views in Korean
+culture and a high outlier in American culture.
 
 ``` r
 #Make a dotplot to demonstrate the totalpageviews per culture  
-cult_views_plot5 <- ggplot(cult_views_tbl2, aes(x = culture, y = totalpageviews)) + 
-                              geom_dotplot()  
+cult_views_plot5 <- ggplot(obj_tbl, aes(x = culture, y = totalpageviews)) + 
+                              geom_dotplot(aes(fill = culture, color = culture), binaxis = "y", stackdir = "center") + 
+                              labs(title = "More Descriptive Plot of Total Views Per Culture", x = "Culture", y = "Total Online Page Views")  
+#Returning the plot  
+cult_views_plot5  
 ```
+
+    ## Bin width defaults to 1/30 of the range of the data. Pick better value with `binwidth`.
+
+![](README_files/figure-gfm/cult_views_dotplot5-1.png)<!-- -->
+
+This dot plot did exactly as I expected. With some shifts to the bin,
+this plot might also have less overlap in the points; however, the
+points of the American views do extend far in the graph. I believe this
+plot does show a more organized version of the jitter plot aside from
+the data points from American culture. Korea still has the highest views
+with American, and Roman in second and third place, respectively.
+Overall These last few plots with the coloring helped out tremendously
+to visual more of the data and understand even the overlapping points.
