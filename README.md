@@ -586,7 +586,7 @@ popular.
 
 ``` r
 #Including the call again so that the plots render correctly  
-obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
+obj_tbl3 <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
 ```
 
     ## # A tibble: 99 × 4
@@ -606,7 +606,7 @@ obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")
 
 ``` r
 #Make a scatterplot of the century versus the totalpageviews
-cent_views_plot3 <- ggplot(obj_tbl, aes(x = century, y = totalpageviews)) + 
+cent_views_plot3 <- ggplot(obj_tbl3, aes(x = century, y = totalpageviews)) + 
                              geom_col(aes(fill = century, color = century)) + 
                              labs(title = "Total Views Per Century", x = "Century", y = "Total Online Views")  
 #Returning the plot  
@@ -633,7 +633,7 @@ guesses for the most viewed culture.
 
 ``` r
 #Including the call again so that the plots render correctly  
-obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
+obj_tbl4 <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
 ```
 
     ## # A tibble: 100 × 4
@@ -653,7 +653,7 @@ obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")
 
 ``` r
 #Make a histogram for the totalpageviews per culture  
-cult_views_plot4 <- ggplot(obj_tbl, aes(x = culture, y = totalpageviews)) + 
+cult_views_plot4 <- ggplot(obj_tbl4, aes(x = culture, y = totalpageviews)) + 
                               geom_jitter(aes(fill = culture, color = culture)) + 
                               labs(title = "Total Views Per Culture", x = "Culture", y = "Total Online Page Views")  
 #Returning the plot  
@@ -681,7 +681,7 @@ culture and a high outlier in American culture.
 
 ``` r
 #Including the call again so that the plots render correctly  
-obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
+obj_tbl5 <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")  
 ```
 
     ## # A tibble: 99 × 4
@@ -701,7 +701,7 @@ obj_tbl <- object_info("1d505e26-5d36-4674-a35b-c40cab886778")
 
 ``` r
 #Make a dotplot to demonstrate the totalpageviews per culture  
-cult_views_plot5 <- ggplot(obj_tbl, aes(x = culture, y = totalpageviews)) + 
+cult_views_plot5 <- ggplot(obj_tbl5, aes(x = culture, y = totalpageviews)) + 
                               geom_dotplot(aes(fill = culture, color = culture), binaxis = "y", stackdir = "center") + 
                               labs(title = "More Descriptive Plot of Total Views Per Culture", x = "Culture", y = "Total Online Page Views")  
 #Returning the plot  
@@ -720,4 +720,4 @@ the data points from American culture. Korea still has the highest views
 with American, and Roman in second and third place, respectively.
 Overall These last few plots with the coloring helped out tremendously
 to visual more of the data and understand even the overlapping data
-points
+points.
